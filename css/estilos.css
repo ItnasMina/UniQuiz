@@ -1,0 +1,672 @@
+/*
+ * UQ Lead Dev - estilos.css
+ * Paleta: Azules profesionales para UniQuiz (UQ)
+ * Cobertura: Landing (index), Login/Registro, Dashboard (Tabs), Edición, Iconos.
+ */
+
+/* ==================================== */
+/* 0. Variables y Reseteo Básico */
+/* ==================================== */
+:root {
+    /* Paleta de Colores UQ (Azules) */
+    --color-dark-bg: #3A3132;        /* Gris Oscuro / Marrón (Fondo de secciones destacadas) */
+    --color-primary-dark: #0F4571;   /* Azul Marino Oscuro (Cabecera, texto principal) */
+    --color-medium-blue: #386DBD;    /* Azul Medio (Botones principales, acentos) */
+    --color-bright-blue-1: #009DDD;  /* Azul Brillante 1 (Botones de acción, separadores) */
+    --color-bright-blue-2: #05D3F8;  /* Azul Brillante 2 (Resaltados, CTA) */
+
+    /* Colores Funcionales */
+    --text-light: #FFFFFF;           /* Texto sobre fondo oscuro */
+    --text-dark: #3A3132;            /* Texto sobre fondo claro */
+    --success-color: #28a745;        /* Verde para Crear (+) */
+    --danger-color: #dc3545;         /* Rojo para Borrar y Cerrar Sesión */
+    --light-bg-color: #f8f9fa;       /* Fondo general de la página (casi blanco) */
+    
+    --font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: var(--font-family);
+    line-height: 1.6;
+    color: var(--text-dark);
+    background-color: var(--light-bg-color); 
+}
+
+/* ==================================== */
+/* 1. LAYOUT GENERAL Y CABECERA */
+/* ==================================== */
+.main-header, .main-footer {
+    padding: 1rem 5%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: var(--color-primary-dark);
+    color: var(--text-light);
+}
+
+/* Ajuste para cabeceras más pequeñas (Login/Registro) */
+.small-header {
+    padding: 0.8rem 5%;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.main-header h1 {
+    font-size: 1.5rem;
+    margin: 0;
+    color: var(--text-light);
+}
+
+.logo-link {
+    color: var(--text-light);
+    text-decoration: none;
+    font-weight: bold;
+}
+
+/* 5. ESTILOS DE IMAGEN Y LOGO */
+.logo-image {
+    height: 60px; /* Altura del logo en la cabecera */
+    width: auto;
+    vertical-align: middle; 
+}
+
+.main-nav a {
+    color: var(--text-light);
+    text-decoration: none;
+    margin-left: 15px;
+    padding: 8px 15px;
+    border-radius: 5px;
+    transition: background-color 0.3s;
+}
+
+.main-nav a.active, .main-nav a:hover {
+    background-color: var(--color-medium-blue);
+}
+
+/* ==================================== */
+/* 2. ESTILOS DE BOTONES */
+/* ==================================== */
+.btn {
+    text-decoration: none;
+    padding: 10px 20px;
+    border: none;
+    cursor: pointer;
+    border-radius: 5px;
+    text-align: center;
+    transition: background-color 0.3s, transform 0.1s;
+    font-weight: bold;
+    display: inline-block;
+}
+
+.btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+}
+
+/* Botón Principal (Login) */
+.btn-primary {
+    background-color: var(--color-medium-blue); 
+    color: var(--text-light);
+}
+.btn-primary:hover {
+    background-color: #4a7fdc; 
+}
+
+/* Botón Secundario (Registro) */
+.btn-secondary {
+    background-color: var(--color-bright-blue-1); 
+    color: var(--text-light);
+}
+.btn-secondary:hover {
+    background-color: #008cc9; 
+}
+
+/* Botón de Llamada a la Acción (Landing) */
+.btn-call-to-action {
+    background-color: var(--color-bright-blue-2); 
+    color: var(--text-dark); 
+    font-size: 1.2rem;
+    margin-top: 30px;
+    padding: 15px 30px;
+}
+.btn-call-to-action:hover {
+    background-color: #04b3d6;
+}
+
+/* Botones CRUD */
+.btn-create { 
+    background-color: var(--success-color); 
+    color: var(--text-light); 
+}
+.btn-delete { 
+    background-color: var(--danger-color); 
+    color: var(--text-light); 
+}
+.btn-full-width {
+    width: 100%;
+    margin-top: 10px;
+}
+
+/* Botón de Vuelta */
+.btn-back {
+    background-color: var(--color-medium-blue);
+    color: var(--text-light);
+    font-size: 0.9rem;
+    padding: 8px 15px;
+}
+
+/* ==================================== */
+/* 3. SECCIÓN LANDING ESPECÍFICA */
+/* ==================================== */
+
+.landing-main {
+    padding: 50px 5%;
+    text-align: center;
+    min-height: 80vh;
+}
+
+.hero {
+    background-color: var(--color-dark-bg); 
+    color: var(--text-light);
+    padding: 80px 40px;
+    border-radius: 10px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+}
+
+.hero h2 {
+    font-size: 2.5rem;
+    color: var(--color-bright-blue-2); 
+    margin-bottom: 10px;
+}
+
+.hero .tagline {
+    font-size: 1.2rem;
+    margin-bottom: 40px;
+}
+
+.features-grid {
+    display: flex;
+    justify-content: space-around;
+    gap: 20px;
+    margin-top: 50px;
+}
+
+.feature-item {
+    flex: 1;
+    padding: 20px;
+    background: var(--text-light); 
+    color: var(--text-dark);
+    border-radius: 8px;
+    text-align: center;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    border-top: 4px solid var(--color-medium-blue);
+}
+
+.feature-item h3 {
+    color: var(--color-primary-dark);
+    margin-bottom: 10px;
+}
+
+.how-it-works {
+    margin-top: 60px;
+    padding: 40px 0;
+}
+
+.how-it-works h3 {
+    font-size: 2rem;
+    margin-bottom: 20px;
+    color: var(--text-dark);
+}
+
+.how-it-works ul {
+    list-style: none;
+    max-width: 600px;
+    margin: 0 auto;
+    text-align: left;
+}
+
+.how-it-works li {
+    background-color: var(--light-bg-color);
+    margin-bottom: 10px;
+    padding: 15px;
+    border-left: 5px solid var(--color-bright-blue-1);
+    border-radius: 4px;
+}
+
+/* ==================================== */
+/* 4. ESTILOS DE FORMULARIOS (GENERALES) */
+/* ==================================== */
+
+.login-body {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+.login-container {
+    flex-grow: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+}
+
+.login-box {
+    background-color: var(--text-light); 
+    padding: 40px;
+    border-radius: 8px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 400px; 
+    text-align: center;
+}
+
+.login-box h2 {
+    color: var(--color-primary-dark);
+    margin-bottom: 25px;
+    font-size: 1.8rem;
+}
+
+.form-group {
+    margin-bottom: 20px;
+    text-align: left;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+    color: var(--text-dark);
+}
+
+/* Estilo unificado para inputs de texto, email, password, textarea, select y number */
+.form-group input[type="email"],
+.form-group input[type="password"],
+.form-group input[type="text"],
+.form-group input[type="number"],
+.form-group textarea,
+.select-standard { 
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 1rem;
+    transition: border-color 0.3s;
+    box-sizing: border-box; 
+}
+
+.form-group input:focus,
+.form-group textarea:focus,
+.form-group .select-standard:focus {
+    border-color: var(--color-bright-blue-1);
+    outline: none;
+    box-shadow: 0 0 5px rgba(0, 157, 221, 0.5);
+}
+
+.form-group textarea {
+    resize: vertical;
+}
+
+.separator {
+    height: 1px;
+    background-color: #e0e0e0;
+    margin: 30px 0;
+}
+
+.new-user-text {
+    margin-bottom: 10px;
+    color: var(--text-dark);
+}
+
+
+/* ==================================== */
+/* 6. ESTILOS DASHBOARD Y TABS (Integrados y Corregidos) */
+/* ==================================== */
+
+.private-header {
+    background-color: var(--color-primary-dark);
+}
+
+.header-with-tabs {
+    /* Mantenemos grid para el Dashboard (Logo | Tabs Flexible | Iconos Usuario) */
+    display: grid;
+    grid-template-columns: auto 1fr auto; 
+    padding: 0 2%; 
+}
+
+/* --- User Navigation (Alineación Corregida para anclar a la derecha) --- */
+.user-nav {
+    display: flex;
+    align-items: center; 
+    gap: 15px;
+    padding: 1rem 0; 
+    /* ¡CORRECCIÓN CLAVE! Mantenemos los iconos a la derecha forzando la justificación */
+    justify-self: end;
+}
+
+.user-welcome {
+    color: var(--text-light);
+    font-size: 1rem;
+    padding-right: 15px;
+    border-right: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.nav-icon {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 0.9rem; 
+    text-decoration: none;
+    color: var(--color-bright-blue-2); 
+    transition: color 0.2s;
+}
+
+.nav-icon:hover {
+    color: var(--text-light);
+}
+
+.btn-logout {
+    color: var(--danger-color);
+    font-weight: bold;
+}
+
+
+/* --- Main Tabs Container --- */
+.main-tabs-container {
+    display: flex;
+    align-items: stretch; 
+    justify-content: flex-start;
+    margin-left: 30px; 
+}
+
+.tab-item {
+    padding: 20px 25px; 
+    text-decoration: none;
+    color: var(--text-light); 
+    font-weight: 600;
+    border-bottom: 4px solid transparent; 
+    transition: all 0.2s ease-in-out;
+    display: flex;
+    align-items: center;
+    height: 100%;
+}
+
+.tab-item:hover {
+    color: var(--text-light);
+    background-color: rgba(0, 0, 0, 0.1); 
+}
+
+.tab-item.active {
+    color: var(--color-bright-blue-2); 
+    border-bottom-color: var(--color-bright-blue-2); 
+    background-color: transparent; 
+}
+
+/* --- Contenido del Dashboard --- */
+.dashboard-content {
+    padding: 30px 2%; 
+    min-height: 70vh;
+    background-color: white; 
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05); 
+}
+
+.dashboard-content h2 {
+    color: var(--color-primary-dark);
+    margin-bottom: 20px;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 10px;
+}
+
+
+/* ==================================== */
+/* 7. ESTILOS LISTADOS Y TABLAS (Solución Robusta con Inline-Block) */
+/* ==================================== */
+
+.header-listado {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 25px;
+}
+
+.data-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
+    background-color: white;
+}
+
+.data-table th, .data-table td {
+    padding: 12px 15px;
+    text-align: left;
+    border-bottom: 1px solid #dee2e6;
+    vertical-align: middle; 
+}
+
+.data-table th {
+    background-color: var(--light-bg-color); 
+    color: var(--color-primary-dark);
+    font-weight: 700;
+    text-transform: uppercase;
+}
+
+.data-table tbody tr:hover {
+    background-color: #f1f1f1;
+}
+
+/* Estado de Publicación */
+.status-tag {
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 0.85rem;
+    font-weight: bold;
+    display: inline-block;
+    vertical-align: middle;
+}
+
+/* Contenedor de los botones CRUD (usamos inline-block y text-align) */
+.action-buttons {
+    white-space: nowrap; 
+    text-align: center; /* Alineación horizontal del grupo de iconos */
+}
+
+/* Botones de acción como elementos en línea/bloque */
+.action-buttons a, .action-buttons form {
+    display: inline-block; 
+    margin: 0 4px; /* Espaciado entre iconos */
+    line-height: 1; 
+    vertical-align: middle;
+    padding: 0;
+}
+
+.btn-action {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    line-height: 1;
+    display: block; 
+}
+
+.status-tag.publico {
+    background-color: var(--success-color);
+    color: var(--text-light);
+}
+
+.status-tag.privado {
+    background-color: var(--color-dark-bg);
+    color: var(--text-light);
+}
+
+.empty-list-message {
+    padding: 20px;
+    border: 1px dashed #ccc;
+    text-align: center;
+    color: var(--text-dark);
+}
+
+
+/* ==================================== */
+/* 8. ESTILOS DE IMÁGENES DE ICONOS (Limitación de Tamaño) */
+/* ==================================== */
+
+.icon-img {
+    display: block;
+    width: auto; 
+    line-height: 1; 
+}
+
+/* 8a. Iconos de Usuario (Perfil y Salir) en la cabecera */
+.user-icon {
+    height: 24px; 
+    width: auto;
+}
+
+/* 8b. Iconos CRUD (Editar y Borrar) en la tabla */
+.crud-icon {
+    height: 20px; 
+    width: auto;
+    vertical-align: middle;
+}
+
+/* ==================================== */
+/* 9. ESTILOS DE EDICIÓN (Página 6 y 7) */
+/* ==================================== */
+
+.edit-container {
+    max-width: 900px;
+    margin: 0 auto; 
+    padding-top: 20px;
+}
+
+.content-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 25px;
+}
+
+.content-header h1 {
+    font-size: 1.5rem;
+    border: none;
+    margin: 0;
+    padding: 0;
+}
+
+/* --- Sub-Navegación por Tabs --- */
+
+.sub-tab-navigation {
+    display: flex;
+    border-bottom: 2px solid #ccc;
+    margin-bottom: 30px;
+}
+
+.sub-tab-item {
+    padding: 12px 20px;
+    text-decoration: none;
+    color: var(--text-dark);
+    font-weight: 600;
+    border: 1px solid transparent;
+    border-bottom: none;
+    transition: all 0.2s;
+    margin-right: 5px;
+    border-radius: 6px 6px 0 0;
+}
+
+.sub-tab-item:hover {
+    background-color: var(--light-bg-color);
+}
+
+.sub-tab-item.active {
+    background-color: white;
+    border-color: #ccc;
+    border-bottom: 2px solid white; /* Simula que el tab se une al contenido */
+    color: var(--color-primary-dark);
+    margin-bottom: -2px;
+}
+
+.sub-tab-content {
+    background-color: white;
+    padding: 20px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    margin-bottom: 25px;
+}
+
+/* --- Tarjetas de Contenido y Formularios --- */
+
+.form-card, .options-card {
+    background-color: white;
+    padding: 20px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    margin-bottom: 25px;
+}
+
+.form-card h3, .options-card h3 {
+    color: var(--color-primary-dark);
+    margin-bottom: 15px;
+    padding-bottom: 5px;
+    border-bottom: 1px dashed #eee;
+}
+
+.form-standard input[type="number"] {
+    /* Desactivar el width: 100% que hereda de la sección 4 */
+    width: auto !important; 
+    min-width: 100px;
+}
+
+.form-standard .checkbox-group,
+.form-standard .radio-group {
+    display: flex;
+    align-items: center;
+    margin-top: 15px;
+    margin-bottom: 25px;
+}
+
+.form-standard .checkbox-group label,
+.form-standard .radio-group label {
+    margin-right: 15px;
+    margin-bottom: 0;
+    font-weight: normal;
+}
+
+/* --- Listado de Preguntas/Opciones (Flexbox seguro) --- */
+
+.question-list, .option-list {
+    list-style: none;
+    padding: 0;
+    margin-top: 15px;
+}
+
+.question-item, .option-item {
+    display: flex; 
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 0;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.question-item:last-child, .option-item:last-child {
+    border-bottom: none;
+}
+
+.question-text, .option-text {
+    font-weight: 500;
+    margin: 0;
+    color: var(--text-dark);
+    flex-grow: 1; 
+    margin-right: 15px;
+}
+
+.option-item.correcta {
+    background-color: rgba(40, 167, 69, 0.05);
+    border-radius: 4px;
+    padding-left: 10px;
+}
