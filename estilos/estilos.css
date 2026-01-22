@@ -1,45 +1,51 @@
-/* * UQ Lead Dev - estilos.css (Versión: NO PURPLE LINKS) 
- * Corrección: Enlaces de tabla siempre del color correcto, nunca morados.
+/* * UQ Lead Dev - estilos.css (Versión FINAL DEFINITIVA)
+ * Contiene: Identity, Dashboard, Resultados SVG, Edición, Upload Fix y Estadísticas de Perfil.
  */
 
-/* 1. IMPORTAR FUENTE Y VARIABLES */
+/* =========================================
+   1. VARIABLES Y FUENTES
+   ========================================= */
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
 
 :root {
-    --primary-gradient: linear-gradient(135deg, #386DBD 0%, #2a5291 100%);
-    --secondary-gradient: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
-    --accent-gradient: linear-gradient(135deg, #386DBD 0%, #00d2ff 100%);
-    --success-gradient: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+    /* --- PALETA CORPORATIVA --- */
+    --primary-gradient: linear-gradient(135deg, #386DBD 0%, #2a5291 100%); /* Azul UQ */
+    --secondary-gradient: linear-gradient(135deg, #2c3e50 0%, #34495e 100%); /* Gris Oscuro */
+    --accent-gradient: linear-gradient(135deg, #386DBD 0%, #00d2ff 100%); /* Cian */
+    --success-gradient: linear-gradient(135deg, #28a745 0%, #20c997 100%); /* Verde */
     
-    --bg-body: #f4f6f9;
+    /* --- FONDOS Y TEXTOS --- */
+    --bg-body: #f8f9fa;
     --bg-card: rgba(255, 255, 255, 0.98);
     --text-main: #333333;
     --text-light: #6c757d;
     
+    /* --- SOMBRAS Y BORDES --- */
     --shadow-sm: 0 2px 4px rgba(0,0,0,0.05);
+    --shadow-md: 0 6px 12px rgba(56, 109, 189, 0.15);
     --shadow-card: 0 10px 15px -3px rgba(56, 109, 189, 0.1), 0 4px 6px -2px rgba(56, 109, 189, 0.05);
     --shadow-hover: 0 20px 25px -5px rgba(56, 109, 189, 0.15), 0 10px 10px -5px rgba(56, 109, 189, 0.04);
-    
     --radius: 12px;
 }
 
-/* 2. RESET Y BASES */
+/* =========================================
+   2. RESET Y BASES GLOBALES
+   ========================================= */
 * { box-sizing: border-box; margin: 0; padding: 0; }
 
 body {
     font-family: 'Poppins', sans-serif;
     background-color: var(--bg-body);
+    /* Patrón de puntos azul muy sutil */
     background-image: radial-gradient(#386DBD 0.5px, transparent 0.5px);
     background-size: 20px 20px; 
-    background-color: #f8f9fa;
     color: var(--text-main);
     line-height: 1.6;
     min-height: 100vh;
-    display: flex; flex-direction: column;
+    display: flex; flex-direction: column; /* Sticky Footer */
 }
 
-/* --- CORRECCIÓN AQUÍ: color: inherit --- */
-/* Esto evita que los enlaces se pongan azules/morados por defecto */
+/* IMPORTANTE: Evita enlaces morados/azules por defecto */
 a { 
     text-decoration: none; 
     transition: all 0.3s ease; 
@@ -47,7 +53,18 @@ a {
 }
 ul { list-style: none; }
 
-/* 3. HEADER GLASSMORPHISM */
+/* =========================================
+   3. ANIMACIONES DE TRANSICIÓN
+   ========================================= */
+/* Movimiento suave hacia arriba al cargar */
+@keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* =========================================
+   4. HEADER (GLASSMORPHISM)
+   ========================================= */
 .main-header {
     background: var(--bg-card);
     backdrop-filter: blur(10px);
@@ -62,6 +79,7 @@ ul { list-style: none; }
 .logo-image { height: 45px; transition: transform 0.3s;}
 .logo:hover .logo-image { transform: scale(1.05); }
 
+/* Tabs de navegación */
 .tab-item {
     padding: 10px 25px;
     border-radius: 50px;
@@ -89,13 +107,18 @@ ul { list-style: none; }
 
 .user-icon { width: 35px; height: 35px; border-radius: 50%; border: 2px solid #e9ecef; object-fit: cover;}
 
-/* 4. LAYOUT Y TARJETAS */
+/* =========================================
+   5. LAYOUT PRINCIPAL Y FORMULARIOS
+   ========================================= */
 .dashboard-content, .login-container { 
     flex: 1; width: 100%; max-width: 1200px; 
     margin: 40px auto; padding: 0 20px; 
-    animation: fadeIn 0.6s ease-out;
+    
+    /* APLICAMOS LA TRANSICIÓN SUAVE */
+    animation: fadeInUp 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
 }
 
+/* Fondo especial para Login/Registro */
 .login-body {
     background: var(--primary-gradient);
     display: flex; align-items: center; justify-content: center;
@@ -109,7 +132,6 @@ ul { list-style: none; }
     border: 1px solid rgba(255,255,255,0.8);
 }
 
-/* 5. FORMULARIOS */
 .form-group { margin-bottom: 25px; position: relative; }
 .form-group label { 
     font-size: 0.85rem; font-weight: 700; color: #495057; 
@@ -128,7 +150,9 @@ input:focus, select:focus, textarea:focus {
     box-shadow: 0 0 0 4px rgba(56, 109, 189, 0.1);
 }
 
-/* 6. BOTONES */
+/* =========================================
+   6. BOTONES
+   ========================================= */
 .btn { 
     padding: 12px 28px; border-radius: 10px; font-weight: 600; letter-spacing: 0.5px;
     cursor: pointer; border: none; display: inline-block; text-align: center;
@@ -143,7 +167,9 @@ input:focus, select:focus, textarea:focus {
 .btn-secondary { background: white; color: var(--text-main); border: 2px solid #dee2e6; }
 .btn-full-width { width: 100%; margin-top: 10px; }
 
-/* 7. TABLA MODERNA */
+/* =========================================
+   7. TABLAS (DASHBOARD)
+   ========================================= */
 .data-table {
     width: 100%; border-collapse: separate; border-spacing: 0 15px; 
     background: transparent; box-shadow: none; overflow: visible;
@@ -160,12 +186,16 @@ input:focus, select:focus, textarea:focus {
     box-shadow: var(--shadow-sm);
     border-radius: var(--radius);
     transition: all 0.3s;
+    
+    /* Efecto cascada opcional para las filas */
+    animation: fadeInUp 0.5s ease-out forwards;
+    opacity: 0; animation-delay: 0.1s;
 }
 
 .data-table tbody tr:hover {
     transform: translateY(-3px);
     box-shadow: var(--shadow-hover);
-    border-left: 4px solid #386DBD;
+    border-left: 4px solid #386DBD; /* Borde azul al hover */
 }
 
 .data-table td {
@@ -177,20 +207,12 @@ input:focus, select:focus, textarea:focus {
 }
 .data-table td:last-child { border-top-right-radius: var(--radius); border-bottom-right-radius: var(--radius); }
 
-/* --- CORRECCIÓN ESPECÍFICA PARA TÍTULOS DE TABLA --- */
-/* Forzamos que el enlace del título sea gris oscuro siempre, y azul al pasar el ratón */
-.data-table td a {
-    color: var(--text-main); /* Gris oscuro por defecto */
-    font-weight: 600;
-}
-.data-table td a:visited {
-    color: var(--text-main); /* Evita el morado */
-}
-.data-table td a:hover {
-    color: #386DBD; /* Azul UniQuiz solo al pasar el ratón */
-}
+/* Corrección de Color de Enlaces en Tabla */
+.data-table td a { color: var(--text-main); font-weight: 600; }
+.data-table td a:visited { color: var(--text-main); }
+.data-table td a:hover { color: #386DBD; }
 
-/* Tags */
+/* Tags de estado */
 .status-tag { 
     padding: 6px 12px; border-radius: 20px; font-size: 0.7rem; font-weight: 800; letter-spacing: 0.5px; 
     display: inline-block;
@@ -198,14 +220,14 @@ input:focus, select:focus, textarea:focus {
 .publico { background: #d4edda; color: #155724; }
 .privado { background: #e2e3e5; color: #383d41; }
 
-/* 8. BOTONES ACCIÓN */
+/* Botones de acción (Iconos) */
 .actions-wrapper { display: flex; gap: 10px; justify-content: flex-end; }
 .actions-wrapper form { margin: 0; padding: 0; display: contents; }
 
 .btn-action.btn-sm-text {
     width: 38px; height: 38px; padding: 0; border-radius: 10px;
     display: flex; align-items: center; justify-content: center;
-    font-size: 0; 
+    font-size: 0; /* Oculta texto, muestra icono */
     transition: all 0.3s;
     box-shadow: 0 2px 5px rgba(0,0,0,0.05);
 }
@@ -219,23 +241,46 @@ input:focus, select:focus, textarea:focus {
 
 .btn-action:hover { transform: scale(1.1); filter: brightness(0.95); }
 
-/* 9. PÁGINA PERFIL */
+/* =========================================
+   8. PERFIL & UPLOAD
+   ========================================= */
 .file-upload-wrapper {
     background: #f8f9fa; border: 2px dashed #dee2e6; border-radius: var(--radius);
     padding: 30px; text-align: center; transition: all 0.3s;
+    position: relative;
 }
 .file-upload-wrapper:hover { border-color: #386DBD; background: #e7f5ff; }
 
-.custom-file-upload { 
-    background: var(--primary-gradient); color: white; padding: 10px 20px; border-radius: 30px; 
-    border: none; font-size: 0.9rem;
+/* --- FIX: OCULTAR EL INPUT ORIGINAL --- */
+.file-upload-wrapper input[type="file"] {
+    display: none; 
 }
+
+/* --- BOTÓN DE SUBIDA LIMPIO (BLANCO/AZUL) --- */
+.custom-file-upload { 
+    background: white; 
+    color: #386DBD; 
+    border: 2px solid #386DBD;
+    padding: 10px 23px; 
+    border-radius: 30px; 
+    font-size: 0.9rem; font-weight: 600; cursor: pointer;
+    display: inline-flex; align-items: center; gap: 8px;
+    transition: all 0.3s;
+    box-shadow: var(--shadow-sm);
+}
+
+.custom-file-upload:hover {
+    background: #e7f5ff; 
+    transform: translateY(-2px); 
+    box-shadow: var(--shadow-md);
+}
+
 .profile-preview { 
     width: 120px; height: 120px; border-radius: 50%; border: 4px solid white; 
     box-shadow: var(--shadow-card); object-fit: cover;
 }
 
-/* 10. LANDING PAGE */
+/* Landing Page Hero */
 .hero {
     background: white; border-radius: var(--radius);
     padding: 60px 40px; text-align: center;
@@ -261,9 +306,167 @@ input:focus, select:focus, textarea:focus {
 .feature-item:hover { transform: translateY(-10px); box-shadow: var(--shadow-hover); border-color: #386DBD; }
 .feature-item h3 { color: #386DBD; margin-bottom: 10px; }
 
+/* =========================================
+   9. RESULTADOS: ANIMACIÓN SVG & TARJETAS
+   ========================================= */
+/* Contenedor del Gráfico SVG - TAMAÑO GRANDE (240px) */
+.score-container {
+    position: relative;
+    width: 240px; 
+    height: 240px; 
+    margin: 0 auto 40px;
+}
+
+.circular-chart {
+    display: block; margin: 0 auto; max-width: 100%; max-height: 100%;
+    transform: rotate(-90deg); /* Empieza arriba */
+}
+
+/* Fondo del círculo más fino */
+.circle-bg {
+    fill: none; stroke: #eee; stroke-width: 1.8; 
+}
+
+/* Progreso del círculo más fino */
+.circle-progress {
+    fill: none; stroke-width: 1.8; stroke-linecap: round;
+    stroke-dasharray: 0, 100; /* Se anima con JS */
+    transition: stroke-dasharray 1.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.score-text-container {
+    position: absolute; top: 50%; left: 50%;
+    transform: translate(-50%, -50%); text-align: center; width: 100%;
+}
+
+/* Texto ajustado para no solapar */
+.score-value {
+    font-size: 4rem; 
+    font-weight: 700; line-height: 1; display: block;
+    font-family: 'Poppins', sans-serif;
+}
+
+.score-label {
+    font-size: 1rem; text-transform: uppercase; color: #999; font-weight: 600; margin-top: 8px; display: block;
+}
+
+/* Tarjetas de Revisión */
+.correction-card {
+    background: white; border-radius: 10px; padding: 20px;
+    margin-bottom: 20px; border-left: 5px solid #ccc;
+    box-shadow: var(--shadow-sm);
+}
+.correction-correct { border-left-color: #28a745; background-color: #f0fff4; }
+.correction-wrong { border-left-color: #dc3545; background-color: #fff5f5; }
+
+.correction-header { display: flex; justify-content: space-between; margin-bottom: 10px; }
+.q-number { font-weight: 700; color: var(--text-light); text-transform: uppercase; font-size: 0.8rem; }
+.q-text { font-size: 1.1rem; font-weight: 600; margin-bottom: 15px; color: var(--text-main); }
+.badge-success { color: #155724; font-weight: bold; }
+.badge-danger { color: #721c24; font-weight: bold; }
+.review-img { max-width: 150px; border-radius: 8px; margin-bottom: 15px; display: block; }
+
+.correction-details { 
+    display: flex; gap: 20px; flex-wrap: wrap; 
+    background: rgba(255,255,255,0.6); padding: 15px; border-radius: 8px;
+}
+.user-choice { color: #333; flex: 1; }
+.correct-choice { color: #28a745; flex: 1; border-left: 2px solid rgba(0,0,0,0.1); padding-left: 20px; }
+
+/* =========================================
+   10. ESTILOS EDICIÓN (TABS & RADIO)
+   ========================================= */
+/* Navegación interna (Pestañas de edición) */
+.edit-tabs {
+    display: flex; gap: 10px; margin-bottom: 20px; border-bottom: 2px solid #e9ecef; padding-bottom: 0;
+}
+.edit-tab-link {
+    padding: 10px 20px; font-weight: 600; color: var(--text-light); border-bottom: 3px solid transparent; transition: all 0.3s;
+    margin-bottom: -2px; /* Para pisar la línea */
+    display: flex; align-items: center; gap: 8px;
+}
+.edit-tab-link:hover { color: var(--primary-gradient); background: rgba(56, 109, 189, 0.05); border-radius: 8px 8px 0 0; }
+.edit-tab-link.active { color: #386DBD; border-bottom-color: #386DBD; background: transparent; }
+
+/* Tarjetas de Selección (Radio Buttons modernos) */
+.radio-group-container {
+    display: flex; gap: 15px; margin-top: 10px;
+}
+.radio-option {
+    flex: 1; position: relative;
+}
+.radio-option input[type="radio"] {
+    position: absolute; opacity: 0; width: 0; height: 0;
+}
+.radio-option label {
+    display: block; padding: 15px; background: #f8f9fa; border: 2px solid #e9ecef;
+    border-radius: 10px; cursor: pointer; text-align: center; transition: all 0.2s;
+    color: var(--text-light); font-weight: 600; font-size: 0.9rem; text-transform: uppercase;
+}
+.radio-option label:hover { border-color: #386DBD; background: white; transform: translateY(-2px); }
+.radio-option input[type="radio"]:checked + label {
+    border-color: #386DBD; background: #e7f5ff; color: #386DBD;
+    box-shadow: 0 4px 10px rgba(56, 109, 189, 0.2);
+}
+
+/* Checkbox moderno */
+.checkbox-wrapper {
+    display: flex; align-items: center; gap: 10px; padding: 10px;
+    background: #f8f9fa; border-radius: 8px; margin-top: 5px;
+}
+.checkbox-wrapper input[type="checkbox"] { width: 20px; height: 20px; margin: 0; }
+
+/* =========================================
+   11. PERFIL & ESTADÍSTICAS (NUEVO)
+   ========================================= */
+/* Pestañas del Perfil */
+.profile-tabs {
+    display: flex; justify-content: center; gap: 20px; 
+    margin-top: 40px; margin-bottom: 30px; border-bottom: 2px solid #e9ecef;
+}
+.profile-tab-btn {
+    background: none; border: none; padding: 10px 30px;
+    font-size: 1.1rem; font-weight: 600; color: var(--text-light);
+    cursor: pointer; position: relative; transition: all 0.3s;
+    font-family: 'Poppins', sans-serif;
+}
+.profile-tab-btn::after {
+    content: ''; position: absolute; bottom: -2px; left: 0; width: 0%; height: 3px;
+    background: var(--primary-gradient); transition: width 0.3s;
+}
+.profile-tab-btn:hover { color: #386DBD; }
+.profile-tab-btn.active { color: #386DBD; }
+.profile-tab-btn.active::after { width: 100%; }
+
+/* Contenedores de contenido (para ocultar/mostrar) */
+.tab-content { display: none; animation: fadeInUp 0.5s ease; }
+.tab-content.active { display: block; }
+
+/* Tarjeta de Estadísticas */
+.stats-grid {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); 
+    gap: 20px; margin-bottom: 30px;
+}
+.stat-card {
+    background: white; padding: 20px; border-radius: 12px;
+    box-shadow: var(--shadow-sm); text-align: center; border: 1px solid #f1f3f5;
+}
+.stat-number { font-size: 2.5rem; font-weight: 700; color: #386DBD; line-height: 1; }
+.stat-label { color: #6c757d; font-size: 0.9rem; text-transform: uppercase; margin-top: 5px; }
+
+/* Contenedor del Gráfico */
+.chart-wrapper {
+    background: white; padding: 20px; border-radius: 12px;
+    box-shadow: var(--shadow-card); position: relative;
+    height: 400px; width: 100%;
+}
+
+/* =========================================
+   12. FOOTER
+   ========================================= */
 .main-footer {
     text-align: center; padding: 30px; color: var(--text-light);
     font-size: 0.9rem; margin-top: auto;
 }
 
-@keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+.alert { padding: 15px; background: #e2e3e5; color: #383d41; border-radius: var(--radius); margin-bottom: 20px; }

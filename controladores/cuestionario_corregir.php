@@ -1,6 +1,6 @@
 <?php
 // UQ Lead Dev: controladores/cuestionario_corregir.php
-// Objetivo: Calcular nota, guardar en histórico y mostrar resultado.
+// Objetivo: Calcular nota Y GUARDAR EL DESGLOSE DE RESPUESTAS.
 
 session_start();
 require_once 'conexion.php';
@@ -11,65 +11,70 @@ if (!isset($_SESSION['usuario_id']) || $_SERVER["REQUEST_METHOD"] != "POST") {
 }
 
 $cuestionario_id = $_POST['cuestionario_id'];
-$respuestas_usuario = $_POST['respuestas'] ?? []; // Array [pregunta_id => opcion_id]
+$respuestas_usuario = $_POST['respuestas'] ?? []; 
 $usuario_id = $_SESSION['usuario_id'];
 
 try {
-    // 1. Obtener todas las preguntas y sus opciones CORRECTAS de este cuestionario
-    // Hacemos un JOIN para traer solo las opciones que valen 1 (es_correcta = 1)
-    $sql = "SELECT p.id as pregunta_id, o.id as opcion_correcta_id 
-            FROM preguntas p
-            JOIN opciones o ON p.id = o.pregunta_id
-            WHERE p.cuestionario_id = :cid AND o.es_correcta = 1";
-    
-    $stmt = $pdo->prepare($sql);
-    $stmt->execute(['cid' => $cuestionario_id]);
-    $solucionario = $stmt->fetchAll(PDO::FETCH_KEY_PAIR); 
-    // FETCH_KEY_PAIR devuelve un array directo: [pregunta_id => opcion_correcta_id]
+    $stmtP = $pdo->prepare("SELECT * FROM preguntas WHERE cuestionario_id = :cid ORDER BY id ASC");
+    $stmtP->execute(['cid' => $cuestionario_id]);
+    $preguntas = $stmtP->fetchAll();
 
-    // 2. Calcular Nota
-    $total_preguntas = count($solucionario);
     $aciertos = 0;
+    $total_preguntas = count($preguntas);
+    $detalles_correccion = []; // ARRAY CLAVE PARA LAS TARJETAS
 
-    if ($total_preguntas > 0) {
-        foreach ($solucionario as $p_id => $correcta_id) {
-            // Si el usuario respondió a esta pregunta Y la respuesta coincide
-            if (isset($respuestas_usuario[$p_id]) && $respuestas_usuario[$p_id] == $correcta_id) {
+    foreach ($preguntas as $pregunta) {
+        $p_id = $pregunta['id'];
+        
+        $stmtCorrecta = $pdo->prepare("SELECT * FROM opciones WHERE pregunta_id = ? AND es_correcta = 1");
+        $stmtCorrecta->execute([$p_id]);
+        $opcion_correcta_bd = $stmtCorrecta->fetch();
+
+        $respuesta_user_id = $respuestas_usuario[$p_id] ?? null;
+        $texto_respuesta_user = "No respondida";
+        $es_acierto = false;
+
+        if ($respuesta_user_id) {
+            $stmtUserOpt = $pdo->prepare("SELECT texto_opcion FROM opciones WHERE id = ?");
+            $stmtUserOpt->execute([$respuesta_user_id]);
+            $optUser = $stmtUserOpt->fetch();
+            if ($optUser) $texto_respuesta_user = $optUser['texto_opcion'];
+
+            if ($opcion_correcta_bd && $respuesta_user_id == $opcion_correcta_bd['id']) {
                 $aciertos++;
+                $es_acierto = true;
             }
         }
-        
-        // Regla de tres para nota sobre 10
-        $nota = ($aciertos / $total_preguntas) * 10;
-    } else {
-        $nota = 0; // Evitar división por cero si el cuestionario no tenía preguntas
+
+        // Guardamos los datos para pintar las tarjetas luego
+        $detalles_correccion[] = [
+            'enunciado' => $pregunta['enunciado'],
+            'imagen'    => $pregunta['imagen'],
+            'tu_respuesta' => $texto_respuesta_user,
+            'respuesta_correcta' => $opcion_correcta_bd['texto_opcion'] ?? 'Error datos',
+            'es_correcta' => $es_acierto
+        ];
     }
 
-    // Formatear a 2 decimales
+    $nota = ($total_preguntas > 0) ? ($aciertos / $total_preguntas) * 10 : 0;
     $nota_final = number_format($nota, 2);
 
-    // 3. Guardar en la tabla 'resultados' (Entidad Extra)
-    $sqlInsert = "INSERT INTO resultados (usuario_id, cuestionario_id, puntuacion, fecha_realizacion) 
-                  VALUES (:uid, :cid, :nota, NOW())";
-    $stmtIns = $pdo->prepare($sqlInsert);
-    $stmtIns->execute([
-        'uid' => $usuario_id,
-        'cid' => $cuestionario_id,
-        'nota' => $nota_final
-    ]);
+    // Guardar en BBDD
+    $stmtIns = $pdo->prepare("INSERT INTO resultados (usuario_id, cuestionario_id, puntuacion, fecha_realizacion) VALUES (:uid, :cid, :nota, NOW())");
+    $stmtIns->execute(['uid' => $usuario_id, 'cid' => $cuestionario_id, 'nota' => $nota_final]);
 
-    // 4. Redirigir a la vista de resultados
-    // Pasamos datos por URL (o sesión) para mostrarlos
+    // Guardar en SESIÓN para que resultado.php lo lea
     $_SESSION['resultado_reciente'] = [
         'nota' => $nota_final,
         'aciertos' => $aciertos,
-        'total' => $total_preguntas
+        'total' => $total_preguntas,
+        'detalles' => $detalles_correccion 
     ];
     
     header("Location: ../vistas/resultado.php?id=" . $cuestionario_id);
     exit;
 
 } catch (PDOException $e) {
-    die("Error al corregir: " . $e->getMessage());
+    die("Error: " . $e->getMessage());
 }
 ?>

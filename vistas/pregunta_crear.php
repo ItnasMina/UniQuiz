@@ -1,164 +1,174 @@
 <?php
-// UQ Lead Dev: pregunta_crear.php
-// Objetivo: Formulario para crear una pregunta. 
-// FIX: Gestiona correctamente los atributos 'required' y 'disabled' al cambiar de tipo.
-
+// UQ Lead Dev: pregunta_crear.php (SOPORTE V/F + MÚLTIPLE)
 session_start();
 require_once '../controladores/conexion.php';
 
-if (!isset($_SESSION['usuario_id'])) {
-    header("Location: login.php");
-    exit;
-}
-
-$cuestionario_id = $_GET['cuestionario_id'] ?? null;
-if (!$cuestionario_id) {
+if (!isset($_SESSION['usuario_id']) || empty($_GET['cid'])) {
     header("Location: dashboard.php");
     exit;
 }
 
-// Obtener info básica
-$stmt = $pdo->prepare("SELECT titulo FROM cuestionarios WHERE id = ?");
-$stmt->execute([$cuestionario_id]);
+$cuestionario_id = $_GET['cid'];
+$usuario_id = $_SESSION['usuario_id'];
+
+$stmt = $pdo->prepare("SELECT titulo FROM cuestionarios WHERE id = :id AND usuario_id = :uid");
+$stmt->execute(['id' => $cuestionario_id, 'uid' => $usuario_id]);
 $cuestionario = $stmt->fetch();
+
+if (!$cuestionario) { header("Location: dashboard.php"); exit; }
 ?>
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Nueva Pregunta | UniQuiz</title>
     <link rel="stylesheet" href="../estilos/estilos.css">
     <link rel="icon" href="../assets/LogoUQ.png" type="image/png">
-    
-    <style>
-        .option-row { display: flex; align-items: center; margin-bottom: 10px; gap: 10px; }
-        .option-row input[type="text"] { flex-grow: 1; }
-        .img-preview { max-width: 200px; margin-top: 10px; display: none; border: 1px solid #ccc; padding: 5px; }
-    </style>
 </head>
 <body class="dashboard-body">
 
     <header class="main-header private-header small-header">
-        <div class="logo">
-            <a href="dashboard.php">
-                <img src="../assets/LogoUQ-w&b.png" alt="Logo UniQuiz" class="logo-image">
-            </a>
-        </div>
-        <div class="user-nav">
-             <a href="cuestionario_editar.php?id=<?php echo $cuestionario_id; ?>&subtab=preguntas" class="btn btn-back">Cancelar y Volver</a>
-        </div>
+        <div class="logo"><a href="dashboard.php"><img src="../assets/LogoUQ-w&b.png" alt="Logo" class="logo-image"></a></div>
+        <div class="user-nav"><a href="cuestionario_preguntas.php?id=<?php echo $cuestionario_id; ?>" class="btn btn-secondary">← Cancelar</a></div>
     </header>
-    
-    <main class="dashboard-content edit-container">
-        
-        <h1>Añadir Pregunta a: <?php echo htmlspecialchars($cuestionario['titulo']); ?></h1>
 
-        <form action="../controladores/pregunta_guardar.php" method="POST" enctype="multipart/form-data" class="form-standard form-card">
-            
-            <input type="hidden" name="cuestionario_id" value="<?php echo $cuestionario_id; ?>">
+    <main class="dashboard-content" style="max-width: 800px;">
+        <div style="margin-bottom: 25px;">
+            <h1 style="color: var(--primary);">Añadir Pregunta</h1>
+            <p style="color: var(--text-light);">Para: <strong><?php echo htmlspecialchars($cuestionario['titulo']); ?></strong></p>
+        </div>
 
-            <div class="form-group">
-                <label for="enunciado">Enunciado de la Pregunta *</label>
-                <textarea id="enunciado" name="enunciado" rows="3" required placeholder="Escribe aquí la pregunta..."></textarea>
-            </div>
+        <div class="form-card">
+            <form action="../controladores/pregunta_guardar.php" method="POST" enctype="multipart/form-data">
+                <input type="hidden" name="cuestionario_id" value="<?php echo $cuestionario_id; ?>">
 
-            <div class="form-group">
-                <label for="imagen">Imagen de apoyo (Opcional)</label>
-                <input type="file" id="imagen" name="imagen" accept="image/*" onchange="previewImage(this)">
-                <img id="preview" class="img-preview" alt="Vista previa">
-            </div>
-
-            <div class="form-group">
-                <label for="tipo">Tipo de Respuesta</label>
-                <select id="tipo" name="tipo" class="select-standard" onchange="toggleOptions()">
-                    <option value="opcion_multiple">Opción Múltiple (Test)</option>
-                    <option value="verdadero_falso">Verdadero / Falso</option>
-                </select>
-            </div>
-
-            <hr class="separator">
-
-            <div id="bloque-multiple">
-                <h4>Opciones de Respuesta</h4>
-                <p style="font-size: 0.9rem; color: #666; margin-bottom: 15px;">Escribe las respuestas. Las dos primeras son obligatorias.</p>
-                
-                <?php for($i=0; $i<4; $i++): ?>
-                    <div class="option-row">
-                        <input type="radio" name="opcion_correcta_idx" value="<?php echo $i; ?>" <?php echo ($i===0)?'checked':''; ?>>
-                        <input type="text" name="opcion_texto[]" class="input-opcion" placeholder="Opción <?php echo $i+1; ?>" <?php echo ($i<2)?'required':''; ?>>
-                    </div>
-                <?php endfor; ?>
-            </div>
-
-            <div id="bloque-vf" style="display: none;">
-                <h4>Respuesta Correcta</h4>
-                <div class="radio-group">
-                    <input type="radio" id="resp_v" name="respuesta_vf" value="V" checked>
-                    <label for="resp_v">Verdadero</label>
-                    
-                    <input type="radio" id="resp_f" name="respuesta_vf" value="F" style="margin-left: 20px;">
-                    <label for="resp_f">Falso</label>
+                <div class="form-group">
+                    <label>Enunciado</label>
+                    <textarea name="enunciado" rows="3" required placeholder="Escribe aquí la pregunta..."></textarea>
                 </div>
-            </div>
 
-            <div class="form-group" style="margin-top: 30px;">
-                <button type="submit" class="btn btn-primary btn-full-width">Guardar Pregunta</button>
-            </div>
+                <div class="form-group">
+                    <label>Imagen de Apoyo (Opcional)</label>
+                    <div class="file-upload-wrapper">
+                        <input type="file" id="img-input" name="imagen" accept="image/*" onchange="previewFile()">
+                        <label for="img-input" class="custom-file-upload">📂 Seleccionar Imagen</label>
+                        <span id="file-name" style="display:block; margin-top:10px; color:#666; font-size:0.9rem; font-style: italic;">Ningún archivo seleccionado</span>
+                    </div>
+                </div>
 
-        </form>
+                <div style="margin-bottom: 20px;">
+                    <label style="font-weight: 600; color: #495057; display:block; margin-bottom: 10px;">TIPO DE PREGUNTA</label>
+                    <div class="radio-group-container" style="max-width: 500px;">
+                        <div class="radio-option">
+                            <input type="radio" id="type-multi" name="tipo_pregunta" value="multiple" checked onchange="toggleQuestionType()">
+                            <label for="type-multi"> Opción Múltiple (4)</label>
+                        </div>
+                        <div class="radio-option">
+                            <input type="radio" id="type-vf" name="tipo_pregunta" value="vf" onchange="toggleQuestionType()">
+                            <label for="type-vf"> Verdadero / Falso</label>
+                        </div>
+                    </div>
+                </div>
 
+                <div style="background: #f8f9fa; padding: 25px; border-radius: 12px; border: 2px solid #e9ecef; margin-bottom: 25px;">
+                    <h3 style="margin-bottom: 15px; font-size: 1rem; color: var(--secondary);">Respuestas</h3>
+                    
+                    <div class="form-group-option">
+                        <div style="display: flex; gap: 10px; align-items: center;">
+                            <input type="radio" name="correcta" value="1" required style="width: 20px; height: 20px; cursor: pointer;">
+                            <input type="text" id="opt_1" name="opcion_1" placeholder="Opción 1" required style="margin-bottom:0;">
+                        </div>
+                    </div>
+
+                    <div class="form-group-option" style="margin-top: 10px;">
+                        <div style="display: flex; gap: 10px; align-items: center;">
+                            <input type="radio" name="correcta" value="2" style="width: 20px; height: 20px; cursor: pointer;">
+                            <input type="text" id="opt_2" name="opcion_2" placeholder="Opción 2" required style="margin-bottom:0;">
+                        </div>
+                    </div>
+
+                    <div class="form-group-option extra-option" style="margin-top: 10px;">
+                        <div style="display: flex; gap: 10px; align-items: center;">
+                            <input type="radio" name="correcta" value="3" style="width: 20px; height: 20px; cursor: pointer;">
+                            <input type="text" id="opt_3" name="opcion_3" placeholder="Opción 3" required style="margin-bottom:0;">
+                        </div>
+                    </div>
+
+                    <div class="form-group-option extra-option" style="margin-top: 10px;">
+                        <div style="display: flex; gap: 10px; align-items: center;">
+                            <input type="radio" name="correcta" value="4" style="width: 20px; height: 20px; cursor: pointer;">
+                            <input type="text" id="opt_4" name="opcion_4" placeholder="Opción 4" required style="margin-bottom:0;">
+                        </div>
+                    </div>
+                </div>
+
+                <div style="text-align: right;">
+                    <button type="submit" class="btn btn-create" style="width: 100%;">Guardar Pregunta</button>
+                </div>
+            </form>
+        </div>
     </main>
 
-    <footer class="main-footer">
-        <p>&copy; <?php echo date("Y"); ?> UniQuiz.</p>
-    </footer>
+    <footer class="main-footer"><p>&copy; 2026 UniQuiz.</p></footer>
 
     <script>
-        function toggleOptions() {
-            const tipo = document.getElementById('tipo').value;
-            const bloqueMultiple = document.getElementById('bloque-multiple');
-            const bloqueVF = document.getElementById('bloque-vf');
-            
-            // Seleccionamos todos los inputs de texto de las opciones múltiples
-            const inputsMultiples = document.querySelectorAll('.input-opcion');
-
-            if (tipo === 'opcion_multiple') {
-                // MOSTRAR Múltiple
-                bloqueMultiple.style.display = 'block';
-                bloqueVF.style.display = 'none';
-                
-                // Reactivar inputs y restaurar 'required' en los dos primeros
-                inputsMultiples.forEach((input, index) => {
-                    input.disabled = false;
-                    // Solo los 2 primeros eran obligatorios originalmente
-                    if (index < 2) input.required = true;
-                });
-
+        // 1. Script para previsualizar nombre de archivo
+        function previewFile() {
+            const input = document.getElementById('img-input');
+            const fileName = document.getElementById('file-name');
+            if(input.files.length > 0){
+                fileName.textContent = "✅ " + input.files[0].name;
+                fileName.style.color = "#28a745";
+                fileName.style.fontWeight = "600";
             } else {
-                // MOSTRAR Verdadero/Falso
-                bloqueMultiple.style.display = 'none';
-                bloqueVF.style.display = 'block';
-                
-                // Desactivar inputs múltiples para que HTML5 no los valide ni los envíe
-                inputsMultiples.forEach(input => {
-                    input.disabled = true;
-                    input.required = false; // Doble seguridad
-                });
+                fileName.textContent = "Ningún archivo seleccionado";
+                fileName.style.color = "#666";
             }
         }
 
-        function previewImage(input) {
-            const preview = document.getElementById('preview');
-            if (input.files && input.files[0]) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    preview.src = e.target.result;
-                    preview.style.display = 'block';
-                }
-                reader.readAsDataURL(input.files[0]);
+        // 2. Script para cambiar entre Múltiple y V/F
+        function toggleQuestionType() {
+            const isVF = document.getElementById('type-vf').checked;
+            const extraOptions = document.querySelectorAll('.extra-option');
+            
+            const input1 = document.getElementById('opt_1');
+            const input2 = document.getElementById('opt_2');
+            const input3 = document.getElementById('opt_3');
+            const input4 = document.getElementById('opt_4');
+
+            if (isVF) {
+                // MODO VERDADERO / FALSO
+                // 1. Ocultar opciones 3 y 4
+                extraOptions.forEach(div => div.style.display = 'none');
+                
+                // 2. Quitar 'required' de la 3 y 4 para que deje enviar
+                input3.required = false;
+                input4.required = false;
+                input3.value = ""; // Limpiar
+                input4.value = ""; // Limpiar
+
+                // 3. Rellenar textos automáticamente
+                input1.value = "Verdadero";
+                input2.value = "Falso";
+                
+                // Opcional: Hacerlos 'readonly' si no quieres que editen el texto
+                // input1.readOnly = true; 
+                // input2.readOnly = true;
+
             } else {
-                preview.style.display = 'none';
+                // MODO MÚLTIPLE (Reset)
+                // 1. Mostrar opciones 3 y 4
+                extraOptions.forEach(div => div.style.display = 'block');
+
+                // 2. Restaurar 'required'
+                input3.required = true;
+                input4.required = true;
+
+                // 3. Limpiar textos para que escriban lo que quieran
+                input1.value = "";
+                input2.value = "";
+                input1.readOnly = false;
+                input2.readOnly = false;
             }
         }
     </script>

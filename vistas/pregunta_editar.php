@@ -1,24 +1,19 @@
 <?php
-// UQ Lead Dev: pregunta_editar.php
-// Objetivo: Formulario PRE-RELLENADO para editar una pregunta existente.
-
+// UQ Lead Dev: pregunta_editar.php (CON SOPORTE V/F)
 session_start();
 require_once '../controladores/conexion.php';
 
-if (!isset($_SESSION['usuario_id'])) {
-    header("Location: login.php");
-    exit;
-}
-
-$pregunta_id = $_GET['id'] ?? null;
-if (!$pregunta_id) {
+// 1. Seguridad
+if (!isset($_SESSION['usuario_id']) || empty($_GET['id'])) {
     header("Location: dashboard.php");
     exit;
 }
 
-// 1. Obtener Datos de la Pregunta y verificar propiedad
+$pregunta_id = $_GET['id'];
 $usuario_id = $_SESSION['usuario_id'];
-$sql = "SELECT p.*, c.titulo as titulo_cuestionario, c.id as cuestionario_id 
+
+// 2. Verificar Propiedad
+$sql = "SELECT p.*, c.titulo as titulo_cuestionario, c.id as cid 
         FROM preguntas p
         JOIN cuestionarios c ON p.cuestionario_id = c.id
         WHERE p.id = :pid AND c.usuario_id = :uid";
@@ -27,28 +22,25 @@ $stmt->execute(['pid' => $pregunta_id, 'uid' => $usuario_id]);
 $pregunta = $stmt->fetch();
 
 if (!$pregunta) {
-    die("Pregunta no encontrada o acceso denegado.");
+    header("Location: dashboard.php");
+    exit;
 }
 
-// 2. Obtener Opciones actuales
-$stmtO = $pdo->prepare("SELECT * FROM opciones WHERE pregunta_id = :pid ORDER BY id ASC");
-$stmtO->execute(['pid' => $pregunta_id]);
-$opciones = $stmtO->fetchAll();
+// 3. Obtener Opciones
+$stmtOpt = $pdo->prepare("SELECT * FROM opciones WHERE pregunta_id = :pid ORDER BY id ASC");
+$stmtOpt->execute(['pid' => $pregunta_id]);
+$opciones = $stmtOpt->fetchAll();
 
-// Lógica para pre-seleccionar la correcta
-// Si es V/F, determinamos si la correcta actual es "Verdadero" o "Falso"
-$vf_correcta = 'V'; // Valor por defecto
-if ($pregunta['tipo'] == 'verdadero_falso') {
-    foreach ($opciones as $op) {
-        if ($op['texto_opcion'] == 'Falso' && $op['es_correcta']) {
-            $vf_correcta = 'F';
-        }
+// 4. DETECTAR TIPO DE PREGUNTA (Lógica Inteligente)
+// Contamos cuántas opciones tienen texto real
+$opciones_validas = 0;
+foreach($opciones as $opt) {
+    if (!empty(trim($opt['texto_opcion']))) {
+        $opciones_validas++;
     }
 }
-
-// Errores flash
-$error = $_SESSION['error_editar_pregunta'] ?? '';
-unset($_SESSION['error_editar_pregunta']);
+// Si hay 2 o menos opciones válidas, asumimos V/F. Si no, Múltiple.
+$es_vf = ($opciones_validas <= 2);
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -58,158 +50,152 @@ unset($_SESSION['error_editar_pregunta']);
     <title>Editar Pregunta | UniQuiz</title>
     <link rel="stylesheet" href="../estilos/estilos.css">
     <link rel="icon" href="../assets/LogoUQ.png" type="image/png">
-    <style>
-        .option-row { display: flex; align-items: center; margin-bottom: 10px; gap: 10px; }
-        .option-row input[type="text"] { flex-grow: 1; }
-        .img-preview { max-width: 200px; margin-top: 10px; border: 1px solid #ccc; padding: 5px; }
-        .current-img-info { margin-bottom: 10px; font-size: 0.9em; color: #555; }
-    </style>
 </head>
-<body class="dashboard-body">
-
-    <header class="main-header private-header small-header">
+<body class="dashboard-body" onload="toggleQuestionType()"> <header class="main-header private-header small-header">
         <div class="logo">
-            <a href="dashboard.php">
-                <img src="../assets/LogoUQ-w&b.png" alt="Logo UniQuiz" class="logo-image">
-            </a>
+            <a href="dashboard.php"><img src="../assets/LogoUQ-w&b.png" alt="Logo" class="logo-image"></a>
         </div>
         <div class="user-nav">
-             <a href="cuestionario_editar.php?id=<?php echo $pregunta['cuestionario_id']; ?>&subtab=preguntas" class="btn btn-back">Cancelar</a>
+             <a href="cuestionario_preguntas.php?id=<?php echo $pregunta['cid']; ?>" class="btn btn-secondary">
+                ← Cancelar
+             </a>
         </div>
     </header>
-    
-    <main class="dashboard-content edit-container">
+
+    <main class="dashboard-content" style="max-width: 800px;">
         
-        <h1>Editar Pregunta</h1>
-        <p class="text-muted">Cuestionario: <?php echo htmlspecialchars($pregunta['titulo_cuestionario']); ?></p>
+        <div style="margin-bottom: 25px;">
+            <h1 style="color: var(--primary);">Editar Pregunta</h1>
+            <p style="color: var(--text-light);">
+                Cuestionario: <strong><?php echo htmlspecialchars($pregunta['titulo_cuestionario']); ?></strong>
+            </p>
+        </div>
 
-        <?php if ($error): ?>
-            <div style="background-color: #f8d7da; color: #721c24; padding: 10px; margin-bottom: 20px;">
-                <?php echo htmlspecialchars($error); ?>
-            </div>
-        <?php endif; ?>
+        <div class="form-card">
+            <form action="../controladores/pregunta_update.php" method="POST" enctype="multipart/form-data">
+                <input type="hidden" name="pregunta_id" value="<?php echo $pregunta_id; ?>">
+                <input type="hidden" name="cuestionario_id" value="<?php echo $pregunta['cid']; ?>">
 
-        <form action="../controladores/pregunta_actualizar.php" method="POST" enctype="multipart/form-data" class="form-standard form-card">
-            
-            <input type="hidden" name="pregunta_id" value="<?php echo $pregunta['id']; ?>">
-            <input type="hidden" name="cuestionario_id" value="<?php echo $pregunta['cuestionario_id']; ?>">
-
-            <div class="form-group">
-                <label for="enunciado">Enunciado *</label>
-                <textarea id="enunciado" name="enunciado" rows="3" required><?php echo htmlspecialchars($pregunta['enunciado']); ?></textarea>
-            </div>
-
-            <div class="form-group">
-                <label for="imagen">Imagen (Opcional)</label>
-                
-                <?php if ($pregunta['imagen']): ?>
-                    <div class="current-img-info">
-                        <p>Imagen actual:</p>
-                        <img src="../almacen/<?php echo htmlspecialchars($pregunta['imagen']); ?>" class="img-preview" style="display:block;">
-                        <small>Sube otra para reemplazarla.</small>
-                    </div>
-                <?php endif; ?>
-
-                <input type="file" id="imagen" name="imagen" accept="image/*" onchange="previewImage(this)">
-                <img id="preview" class="img-preview" alt="Vista previa nueva" style="display:none;">
-            </div>
-
-            <div class="form-group">
-                <label for="tipo">Tipo de Respuesta</label>
-                <select id="tipo" name="tipo" class="select-standard" onchange="toggleOptions()">
-                    <option value="opcion_multiple" <?php echo ($pregunta['tipo'] == 'opcion_multiple') ? 'selected' : ''; ?>>Opción Múltiple (Test)</option>
-                    <option value="verdadero_falso" <?php echo ($pregunta['tipo'] == 'verdadero_falso') ? 'selected' : ''; ?>>Verdadero / Falso</option>
-                </select>
-            </div>
-
-            <hr class="separator">
-
-            <div id="bloque-multiple">
-                <h4>Opciones de Respuesta</h4>
-                <?php 
-                    // Preparamos 4 iteraciones. Si hay menos opciones guardadas (ej: 3), rellenamos vacíos.
-                    // Si el tipo actual es V/F, las opciones guardadas no sirven para este bloque, saldrán vacías.
-                    for($i=0; $i<4; $i++): 
-                        $texto_val = '';
-                        $checked = '';
-                        
-                        if ($pregunta['tipo'] == 'opcion_multiple' && isset($opciones[$i])) {
-                            $texto_val = $opciones[$i]['texto_opcion'];
-                            if ($opciones[$i]['es_correcta']) $checked = 'checked';
-                        }
-                        // Default check first if none selected (rare edge case)
-                        if ($i==0 && $pregunta['tipo'] != 'opcion_multiple') $checked = 'checked';
-                ?>
-                    <div class="option-row">
-                        <input type="radio" name="opcion_correcta_idx" value="<?php echo $i; ?>" <?php echo $checked; ?>>
-                        <input type="text" name="opcion_texto[]" class="input-opcion" value="<?php echo htmlspecialchars($texto_val); ?>" placeholder="Opción <?php echo $i+1; ?>" <?php echo ($i<2)?'required':''; ?>>
-                    </div>
-                <?php endfor; ?>
-            </div>
-
-            <div id="bloque-vf" style="display: none;">
-                <h4>Respuesta Correcta</h4>
-                <div class="radio-group">
-                    <input type="radio" id="resp_v" name="respuesta_vf" value="V" <?php echo ($vf_correcta == 'V') ? 'checked' : ''; ?>>
-                    <label for="resp_v">Verdadero</label>
-                    
-                    <input type="radio" id="resp_f" name="respuesta_vf" value="F" style="margin-left: 20px;" <?php echo ($vf_correcta == 'F') ? 'checked' : ''; ?>>
-                    <label for="resp_f">Falso</label>
+                <div class="form-group">
+                    <label>Enunciado</label>
+                    <textarea name="enunciado" rows="3" required><?php echo htmlspecialchars($pregunta['enunciado']); ?></textarea>
                 </div>
-            </div>
 
-            <div class="form-group" style="margin-top: 30px;">
-                <button type="submit" class="btn btn-primary btn-full-width">Guardar Cambios</button>
-            </div>
+                <div class="form-group">
+                    <label>Imagen</label>
+                    <?php if(!empty($pregunta['imagen'])): ?>
+                        <div style="margin-bottom: 10px; display:flex; align-items:center; gap:15px;">
+                            <img src="../almacen/<?php echo htmlspecialchars($pregunta['imagen']); ?>" style="height: 80px; border-radius: 6px; border:1px solid #ddd;">
+                            <label style="font-weight: normal; font-size: 0.9rem; cursor: pointer; color: #dc3545;">
+                                <input type="checkbox" name="borrar_imagen" value="1"> 🗑️ Borrar esta imagen
+                            </label>
+                        </div>
+                    <?php endif; ?>
 
-        </form>
+                    <div class="file-upload-wrapper">
+                        <input type="file" id="img-input" name="imagen" accept="image/*" onchange="previewFile()">
+                        <label for="img-input" class="custom-file-upload">🔄 Cambiar Imagen</label>
+                        <span id="file-name" style="display:block; margin-top:10px; color:#666; font-size:0.9rem;"></span>
+                    </div>
+                </div>
+
+                <div style="margin-bottom: 20px;">
+                    <label style="font-weight: 600; color: #495057; display:block; margin-bottom: 10px;">TIPO DE PREGUNTA</label>
+                    <div class="radio-group-container" style="max-width: 500px;">
+                        <div class="radio-option">
+                            <input type="radio" id="type-multi" name="tipo_pregunta" value="multiple" 
+                                   <?php echo (!$es_vf) ? 'checked' : ''; ?> onchange="toggleQuestionType()">
+                            <label for="type-multi"> Opción Múltiple</label>
+                        </div>
+                        <div class="radio-option">
+                            <input type="radio" id="type-vf" name="tipo_pregunta" value="vf" 
+                                   <?php echo ($es_vf) ? 'checked' : ''; ?> onchange="toggleQuestionType()">
+                            <label for="type-vf"> Verdadero / Falso</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div style="background: #f8f9fa; padding: 25px; border-radius: 12px; border: 2px solid #e9ecef; margin-bottom: 25px;">
+                    <h3 style="margin-bottom: 15px; font-size: 1rem; color: var(--secondary);">Respuestas</h3>
+                    
+                    <?php 
+                    for($i=0; $i<4; $i++): 
+                        $opt = $opciones[$i] ?? null;
+                        $texto = $opt ? $opt['texto_opcion'] : '';
+                        $es_correcta = $opt ? $opt['es_correcta'] : 0;
+                        $opt_id = $opt ? $opt['id'] : ''; // Si es nueva (caso raro), irá vacía
+                        
+                        // Clase especial para ocultar la 3 y 4 con JS
+                        $extraClass = ($i >= 2) ? 'extra-option' : '';
+                    ?>
+                    <div class="form-group-option <?php echo $extraClass; ?>" style="margin-bottom: 15px;">
+                        <div style="display: flex; gap: 10px; align-items: center;">
+                            <input type="radio" name="correcta_idx" value="<?php echo $i; ?>" 
+                                   <?php echo ($es_correcta) ? 'checked' : ''; ?> 
+                                   style="width: 20px; height: 20px; cursor: pointer;" required>
+                            
+                            <input type="text" id="opt_<?php echo $i; ?>" name="opciones[<?php echo $i; ?>]" 
+                                   value="<?php echo htmlspecialchars($texto); ?>" 
+                                   placeholder="Opción <?php echo $i+1; ?>" required style="margin-bottom:0;">
+                            
+                            <input type="hidden" name="ids_opciones[<?php echo $i; ?>]" value="<?php echo $opt_id; ?>">
+                        </div>
+                    </div>
+                    <?php endfor; ?>
+                </div>
+
+                <div style="text-align: right;">
+                    <button type="submit" class="btn btn-primary" style="width: 100%;">Guardar Cambios</button>
+                </div>
+            </form>
+        </div>
 
     </main>
-
-    <footer class="main-footer">
-        <p>&copy; <?php echo date("Y"); ?> UniQuiz.</p>
-    </footer>
+    
+    <footer class="main-footer"><p>&copy; 2026 UniQuiz.</p></footer>
 
     <script>
-        function toggleOptions() {
-            const tipo = document.getElementById('tipo').value;
-            const bloqueMultiple = document.getElementById('bloque-multiple');
-            const bloqueVF = document.getElementById('bloque-vf');
-            const inputsMultiples = document.querySelectorAll('.input-opcion');
-
-            if (tipo === 'opcion_multiple') {
-                bloqueMultiple.style.display = 'block';
-                bloqueVF.style.display = 'none';
-                inputsMultiples.forEach((input, index) => {
-                    input.disabled = false;
-                    if (index < 2) input.required = true;
-                });
-            } else {
-                bloqueMultiple.style.display = 'none';
-                bloqueVF.style.display = 'block';
-                inputsMultiples.forEach(input => {
-                    input.disabled = true;
-                    input.required = false;
-                });
+        function previewFile() {
+            const input = document.getElementById('img-input');
+            const fileName = document.getElementById('file-name');
+            if(input.files.length > 0){
+                fileName.textContent = "Nueva imagen: " + input.files[0].name;
+                fileName.style.color = "#28a745";
+                fileName.style.fontWeight = "600";
             }
         }
 
-        function previewImage(input) {
-            const preview = document.getElementById('preview');
-            if (input.files && input.files[0]) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    preview.src = e.target.result;
-                    preview.style.display = 'block';
-                }
-                reader.readAsDataURL(input.files[0]);
+        // Lógica para mostrar/ocultar campos según V/F o Múltiple
+        function toggleQuestionType() {
+            const isVF = document.getElementById('type-vf').checked;
+            const extraOptions = document.querySelectorAll('.extra-option');
+            
+            const input1 = document.getElementById('opt_0'); // Ojo: arrays PHP empiezan en 0
+            const input2 = document.getElementById('opt_1');
+            const input3 = document.getElementById('opt_2');
+            const input4 = document.getElementById('opt_3');
+
+            if (isVF) {
+                // MODO V/F
+                extraOptions.forEach(div => div.style.display = 'none');
+                
+                // Quitar required y limpiar valores de las ocultas
+                if(input3) { input3.required = false; input3.value = ""; }
+                if(input4) { input4.required = false; input4.value = ""; }
+
+                // Si están vacíos, sugerir V/F (útil si cambian de tipo)
+                if(input1 && input1.value === "") input1.value = "Verdadero";
+                if(input2 && input2.value === "") input2.value = "Falso";
+
             } else {
-                preview.style.display = 'none';
+                // MODO MÚLTIPLE
+                extraOptions.forEach(div => div.style.display = 'block');
+                
+                // Restaurar required
+                if(input3) input3.required = true;
+                if(input4) input4.required = true;
             }
         }
-
-        // Ejecutar al cargar para establecer el estado inicial correcto
-        window.onload = toggleOptions;
     </script>
 </body>
 </html>
