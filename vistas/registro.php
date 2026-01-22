@@ -25,7 +25,7 @@ $mensaje_error = ''; // Variable para mostrar errores al usuario, si los hubiera
 
     <header class="main-header small-header">
         <div class="logo">
-            <a href="index.php">
+            <a href="../index.php">
                 <img src="../assets/LogoUQ-w&b.png" alt="Logo UniQuiz" class="logo-image">
             </a>
         </div>

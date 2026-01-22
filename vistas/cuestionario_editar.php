@@ -25,27 +25,27 @@ include 'includes/funciones.php';
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Editando: <?php echo htmlspecialchars($cuestionario_titulo); ?> | UniQuiz</title>
     
-    <link rel="stylesheet" href="css/estilos.css">
-    <link rel="icon" href="assets/LogoUQ-w&b.png" type="image/png"> 
+    <link rel="stylesheet" href="../estilos/estilos.css">
+    <link rel="icon" href="../assets/LogoUQ-w&b.png" type="image/png"> 
 </head>
 <body class="dashboard-body">
 
     <header class="main-header private-header header-with-tabs">
         <div class="logo">
             <a href="dashboard.php">
-                <img src="assets/LogoUQ-w&b.png" alt="Logo UniQuiz con texto" class="logo-image">
+                <img src="../assets/LogoUQ-w&b.png" alt="Logo UniQuiz con texto" class="logo-image">
             </a>
         </div>
         
         <nav class="user-nav">
             <span class="user-welcome">Hola, <?php echo htmlspecialchars($nombre_usuario); ?></span>
             
-            <a href="usuario_perfil.php" class="nav-icon" title="Mi Perfil"> <img src="assets/IconoPerfil.png" alt="Mi Perfil" class="icon-img user-icon">
+            <a href="usuario_perfil.php" class="nav-icon" title="Mi Perfil"> <img src="../assets/IconoPerfil.png" alt="Mi Perfil" class="icon-img user-icon">
                 Mi Perfil 
             </a>
             
             <a href="logout.php" class="nav-icon btn-logout" title="Cerrar Sesión">
-                <img src="assets/IconoSalir.png" alt="Cerrar Sesión" class="icon-img user-icon">
+                <img src="../assets/IconoSalir.png" alt="Cerrar Sesión" class="icon-img user-icon">
                 Salir 
             </a>
         </nav>
@@ -113,20 +113,20 @@ include 'includes/funciones.php';
                     <li class="question-item">
                         <p class="question-text">1. ¿Cuál es el puerto estándar de MySQL?</p>
                         <div class="action-buttons">
-                            <a href="pregunta_editar.php?id=1" class="btn-action" title="Editar Pregunta"> <img src="assets/IconoEditar.png" alt="Editar" class="icon-img crud-icon">
+                            <a href="pregunta_editar.php?id=1" class="btn-action" title="Editar Pregunta"> <img src="../assets/IconoEditar.png" alt="Editar" class="icon-img crud-icon">
                             </a>
                             <button class="btn-action btn-delete" title="Borrar Pregunta">
-                                <img src="assets/IconoPapelera.png" alt="Borrar" class="icon-img crud-icon">
+                                <img src="../assets/IconoPapelera.png" alt="Borrar" class="icon-img crud-icon">
                             </button>
                         </div>
                     </li>
                     <li class="question-item">
                         <p class="question-text">2. PHP es un lenguaje de programación compilado (V/F).</p>
                         <div class="action-buttons">
-                            <a href="pregunta_editar.php?id=2" class="btn-action" title="Editar Pregunta"> <img src="assets/IconoEditar.png" alt="Editar" class="icon-img crud-icon">
+                            <a href="pregunta_editar.php?id=2" class="btn-action" title="Editar Pregunta"> <img src="../assets/IconoEditar.png" alt="Editar" class="icon-img crud-icon">
                             </a>
                             <button class="btn-action btn-delete" title="Borrar Pregunta">
-                                <img src="assets/IconoPapelera.png" alt="Borrar" class="icon-img crud-icon">
+                                <img src="../assets/IconoPapelera.png" alt="Borrar" class="icon-img crud-icon">
                             </button>
                         </div>
                     </li>

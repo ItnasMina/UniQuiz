@@ -1,10 +1,6 @@
-<?php
-// UQ Lead Dev: index.php
+<!--// UQ Lead Dev: index.php
 // Objetivo: Página de aterrizaje (Landing Page) para UniQuiz.
-// Nota: No se requiere session_start() ya que es una página pública.
-// Incluimos funciones esenciales (aunque estarán vacías por ahora)
-include 'includes/funciones.php';
-?>
+-->
 
 <!DOCTYPE html>
 <html lang="es">
@@ -13,7 +9,7 @@ include 'includes/funciones.php';
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>UniQuiz - Plataforma de Cuestionarios para Universitarios</title>
     <link rel="stylesheet" href="estilos/estilos.css">  
-    <link rel="icon" href="/assets/LogoUQ.png" type="image/x-icon">
+    <link rel="icon" href="assets/LogoUQ.png" type="image/x-icon">
 </head>
 <body>
 
@@ -24,7 +20,7 @@ include 'includes/funciones.php';
             </a>
         </div>
         <nav class="main-nav">
-            <a href="dashboard.php" class="active">Inicio</a>
+            <a href="vistas/dashboard.php" class="active">Inicio</a>
             <a href="vistas/login.php" class="btn btn-primary">Iniciar Sesión</a>
             <a href="vistas/registro.php" class="btn btn-secondary">Registrarse</a>
         </nav>
