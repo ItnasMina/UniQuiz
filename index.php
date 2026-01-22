@@ -3,7 +3,6 @@
 // Objetivo: Página de aterrizaje (Landing Page) para UniQuiz.
 // Nota: No se requiere session_start() ya que es una página pública.
 // Incluimos funciones esenciales (aunque estarán vacías por ahora)
-include 'include/funciones.php';
 ?>
 
 <!DOCTYPE html>
@@ -24,7 +23,6 @@ include 'include/funciones.php';
             </a>
         </div>
         <nav class="main-nav">
-            <a href="vistas/dashboard.php" class="active">Inicio</a>
             <a href="vistas/login.php" class="btn btn-primary">Iniciar Sesión</a>
             <a href="vistas/registro.php" class="btn btn-secondary">Registrarse</a>
         </nav>
