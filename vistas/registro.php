@@ -1,23 +1,28 @@
 <?php
 // UQ Lead Dev: registro.php
-// Objetivo: Manejar el formulario de registro de nuevo usuario.
+// Objetivo: Vista del formulario de registro. Conecta con el controlador para crear cuenta.
 
-include '../include/funciones.php';
+session_start();
 
-$mensaje_error = ''; // Variable para mostrar errores al usuario, si los hubiera.
+// Si ya está logueado, lo mandamos al dashboard directamente
+if (isset($_SESSION['usuario_id'])) {
+    header("Location: dashboard.php");
+    exit;
+}
 
-// Aquí iría la lógica PHP para procesar el formulario de registro
-// 1. Sanitización y validación de inputs.
-// 2. Usar password_hash() para la contraseña antes de guardar.
-// 3. Insertar en la tabla 'usuarios'.
-// ...
+// Gestión de errores (Flash Messages)
+$mensaje_error = '';
+if (isset($_SESSION['error_registro'])) {
+    $mensaje_error = $_SESSION['error_registro'];
+    unset($_SESSION['error_registro']); // Limpiamos el error para que no salga siempre
+}
 ?>
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Crear Cuenta en UniQuiz</title>
+    <title>Crear Cuenta | UniQuiz</title>
     <link rel="stylesheet" href="../estilos/estilos.css">
     <link rel="icon" href="../assets/LogoUQ.png" type="image/x-icon">
 </head>
@@ -36,10 +41,12 @@ $mensaje_error = ''; // Variable para mostrar errores al usuario, si los hubiera
             <h2>Crear Cuenta Nueva</h2>
 
             <?php if (!empty($mensaje_error)): ?>
-                <p class="error-message"><?php echo htmlspecialchars($mensaje_error); ?></p>
+                <div style="background-color: #f8d7da; color: #721c24; padding: 10px; border-radius: 4px; margin-bottom: 20px; border: 1px solid #f5c6cb; text-align: left;">
+                    <strong>¡Error!</strong> <?php echo htmlspecialchars($mensaje_error); ?>
+                </div>
             <?php endif; ?>
 
-            <form action="registro.php" method="POST" class="login-form">
+            <form action="../controladores/usuario_registro.php" method="POST" class="login-form">
                 
                 <div class="form-group">
                     <label for="nombre">Nombre Completo</label>

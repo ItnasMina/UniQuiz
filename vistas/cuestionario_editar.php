@@ -44,7 +44,7 @@ include '../include/funciones.php';
                 Mi Perfil 
             </a>
             
-            <a href="logout.php" class="nav-icon btn-logout" title="Cerrar Sesión">
+            <a href="../controladores/usuario_logout.php" class="nav-icon btn-logout" title="Cerrar Sesión">
                 <img src="../assets/IconoSalir.png" alt="Cerrar Sesión" class="icon-img user-icon">
                 Salir 
             </a>

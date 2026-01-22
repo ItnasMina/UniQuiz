@@ -1,22 +1,31 @@
 <?php
 // UQ Lead Dev: login.php
-// Objetivo: Manejar el formulario de inicio de sesión y enlazar al registro.
+// Objetivo: Formulario de inicio de sesión. Muestra errores si el controlador los devuelve.
 
-// Incluimos funciones esenciales (aunque no se usan para la maquetación)
-include '../include/funciones.php';
-// Nota: session_start() se incluiría aquí si estuviéramos procesando el login.
+session_start();
 
-$mensaje_error = ''; // Variable para mostrar errores al usuario, si los hubiera.
+// Si ya está logueado, mandar al dashboard
+if (isset($_SESSION['usuario_id'])) {
+    header("Location: dashboard.php");
+    exit;
+}
 
-// Aquí iría la lógica PHP para procesar el formulario (POST)
-// ...
+// Recoger mensajes de error flash y borrarlos después de leerlos
+$mensaje_error = '';
+if (isset($_SESSION['error_login'])) {
+    $mensaje_error = $_SESSION['error_login'];
+    unset($_SESSION['error_login']);
+}
+
+// No necesitamos incluir funciones.php para la maqueta, pero sí para el header si lo usa dinámico
+// include '../include/funciones.php'; 
 ?>
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Iniciar Sesión en UniQuiz</title>
+    <title>Iniciar Sesión | UniQuiz</title>
     <link rel="stylesheet" href="../estilos/estilos.css">
     <link rel="icon" href="../assets/LogoUQ.png" type="image/x-icon">
 </head>
@@ -24,7 +33,9 @@ $mensaje_error = ''; // Variable para mostrar errores al usuario, si los hubiera
 
     <header class="main-header small-header">
         <div class="logo">
-            <a href="../index.php" class="logo-link">UniQuiz (UQ)</a>
+            <a href="../index.php">
+                <img src="../assets/LogoUQ-w&b.png" alt="Logo UniQuiz" class="logo-image">
+            </a>
         </div>
     </header>
 
@@ -33,10 +44,12 @@ $mensaje_error = ''; // Variable para mostrar errores al usuario, si los hubiera
             <h2>Inicio de Sesión</h2>
 
             <?php if (!empty($mensaje_error)): ?>
-                <p class="error-message"><?php echo htmlspecialchars($mensaje_error); ?></p>
+                <div style="background-color: #f8d7da; color: #721c24; padding: 10px; border-radius: 4px; margin-bottom: 20px; border: 1px solid #f5c6cb;">
+                    <?php echo htmlspecialchars($mensaje_error); ?>
+                </div>
             <?php endif; ?>
 
-            <form action="login.php" method="POST" class="login-form">
+            <form action="../controladores/usuario_login.php" method="POST" class="login-form">
                 
                 <div class="form-group">
                     <label for="email">Email Universitario</label>
