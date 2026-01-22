@@ -1,672 +1,269 @@
-/*
- * UQ Lead Dev - estilos.css
- * Paleta: Azules profesionales para UniQuiz (UQ)
- * Cobertura: Landing (index), Login/Registro, Dashboard (Tabs), Edición, Iconos.
+/* * UQ Lead Dev - estilos.css (Versión: NO PURPLE LINKS) 
+ * Corrección: Enlaces de tabla siempre del color correcto, nunca morados.
  */
 
-/* ==================================== */
-/* 0. Variables y Reseteo Básico */
-/* ==================================== */
+/* 1. IMPORTAR FUENTE Y VARIABLES */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+
 :root {
-    /* Paleta de Colores UQ (Azules) */
-    --color-dark-bg: #3A3132;        /* Gris Oscuro / Marrón (Fondo de secciones destacadas) */
-    --color-primary-dark: #0F4571;   /* Azul Marino Oscuro (Cabecera, texto principal) */
-    --color-medium-blue: #386DBD;    /* Azul Medio (Botones principales, acentos) */
-    --color-bright-blue-1: #009DDD;  /* Azul Brillante 1 (Botones de acción, separadores) */
-    --color-bright-blue-2: #05D3F8;  /* Azul Brillante 2 (Resaltados, CTA) */
-
-    /* Colores Funcionales */
-    --text-light: #FFFFFF;           /* Texto sobre fondo oscuro */
-    --text-dark: #3A3132;            /* Texto sobre fondo claro */
-    --success-color: #28a745;        /* Verde para Crear (+) */
-    --danger-color: #dc3545;         /* Rojo para Borrar y Cerrar Sesión */
-    --light-bg-color: #f8f9fa;       /* Fondo general de la página (casi blanco) */
+    --primary-gradient: linear-gradient(135deg, #386DBD 0%, #2a5291 100%);
+    --secondary-gradient: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+    --accent-gradient: linear-gradient(135deg, #386DBD 0%, #00d2ff 100%);
+    --success-gradient: linear-gradient(135deg, #28a745 0%, #20c997 100%);
     
-    --font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    --bg-body: #f4f6f9;
+    --bg-card: rgba(255, 255, 255, 0.98);
+    --text-main: #333333;
+    --text-light: #6c757d;
+    
+    --shadow-sm: 0 2px 4px rgba(0,0,0,0.05);
+    --shadow-card: 0 10px 15px -3px rgba(56, 109, 189, 0.1), 0 4px 6px -2px rgba(56, 109, 189, 0.05);
+    --shadow-hover: 0 20px 25px -5px rgba(56, 109, 189, 0.15), 0 10px 10px -5px rgba(56, 109, 189, 0.04);
+    
+    --radius: 12px;
 }
 
-* {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
-}
+/* 2. RESET Y BASES */
+* { box-sizing: border-box; margin: 0; padding: 0; }
 
 body {
-    font-family: var(--font-family);
+    font-family: 'Poppins', sans-serif;
+    background-color: var(--bg-body);
+    background-image: radial-gradient(#386DBD 0.5px, transparent 0.5px);
+    background-size: 20px 20px; 
+    background-color: #f8f9fa;
+    color: var(--text-main);
     line-height: 1.6;
-    color: var(--text-dark);
-    background-color: var(--light-bg-color); 
-}
-
-/* ==================================== */
-/* 1. LAYOUT GENERAL Y CABECERA */
-/* ==================================== */
-.main-header, .main-footer {
-    padding: 1rem 5%;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    background-color: var(--color-primary-dark);
-    color: var(--text-light);
-}
-
-/* Ajuste para cabeceras más pequeñas (Login/Registro) */
-.small-header {
-    padding: 0.8rem 5%;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-}
-
-.main-header h1 {
-    font-size: 1.5rem;
-    margin: 0;
-    color: var(--text-light);
-}
-
-.logo-link {
-    color: var(--text-light);
-    text-decoration: none;
-    font-weight: bold;
-}
-
-/* 5. ESTILOS DE IMAGEN Y LOGO */
-.logo-image {
-    height: 60px; /* Altura del logo en la cabecera */
-    width: auto;
-    vertical-align: middle; 
-}
-
-.main-nav a {
-    color: var(--text-light);
-    text-decoration: none;
-    margin-left: 15px;
-    padding: 8px 15px;
-    border-radius: 5px;
-    transition: background-color 0.3s;
-}
-
-.main-nav a.active, .main-nav a:hover {
-    background-color: var(--color-medium-blue);
-}
-
-/* ==================================== */
-/* 2. ESTILOS DE BOTONES */
-/* ==================================== */
-.btn {
-    text-decoration: none;
-    padding: 10px 20px;
-    border: none;
-    cursor: pointer;
-    border-radius: 5px;
-    text-align: center;
-    transition: background-color 0.3s, transform 0.1s;
-    font-weight: bold;
-    display: inline-block;
-}
-
-.btn:hover {
-    transform: translateY(-1px);
-    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-}
-
-/* Botón Principal (Login) */
-.btn-primary {
-    background-color: var(--color-medium-blue); 
-    color: var(--text-light);
-}
-.btn-primary:hover {
-    background-color: #4a7fdc; 
-}
-
-/* Botón Secundario (Registro) */
-.btn-secondary {
-    background-color: var(--color-bright-blue-1); 
-    color: var(--text-light);
-}
-.btn-secondary:hover {
-    background-color: #008cc9; 
-}
-
-/* Botón de Llamada a la Acción (Landing) */
-.btn-call-to-action {
-    background-color: var(--color-bright-blue-2); 
-    color: var(--text-dark); 
-    font-size: 1.2rem;
-    margin-top: 30px;
-    padding: 15px 30px;
-}
-.btn-call-to-action:hover {
-    background-color: #04b3d6;
-}
-
-/* Botones CRUD */
-.btn-create { 
-    background-color: var(--success-color); 
-    color: var(--text-light); 
-}
-.btn-delete { 
-    background-color: var(--danger-color); 
-    color: var(--text-light); 
-}
-.btn-full-width {
-    width: 100%;
-    margin-top: 10px;
-}
-
-/* Botón de Vuelta */
-.btn-back {
-    background-color: var(--color-medium-blue);
-    color: var(--text-light);
-    font-size: 0.9rem;
-    padding: 8px 15px;
-}
-
-/* ==================================== */
-/* 3. SECCIÓN LANDING ESPECÍFICA */
-/* ==================================== */
-
-.landing-main {
-    padding: 50px 5%;
-    text-align: center;
-    min-height: 80vh;
-}
-
-.hero {
-    background-color: var(--color-dark-bg); 
-    color: var(--text-light);
-    padding: 80px 40px;
-    border-radius: 10px;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-}
-
-.hero h2 {
-    font-size: 2.5rem;
-    color: var(--color-bright-blue-2); 
-    margin-bottom: 10px;
-}
-
-.hero .tagline {
-    font-size: 1.2rem;
-    margin-bottom: 40px;
-}
-
-.features-grid {
-    display: flex;
-    justify-content: space-around;
-    gap: 20px;
-    margin-top: 50px;
-}
-
-.feature-item {
-    flex: 1;
-    padding: 20px;
-    background: var(--text-light); 
-    color: var(--text-dark);
-    border-radius: 8px;
-    text-align: center;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-    border-top: 4px solid var(--color-medium-blue);
-}
-
-.feature-item h3 {
-    color: var(--color-primary-dark);
-    margin-bottom: 10px;
-}
-
-.how-it-works {
-    margin-top: 60px;
-    padding: 40px 0;
-}
-
-.how-it-works h3 {
-    font-size: 2rem;
-    margin-bottom: 20px;
-    color: var(--text-dark);
-}
-
-.how-it-works ul {
-    list-style: none;
-    max-width: 600px;
-    margin: 0 auto;
-    text-align: left;
-}
-
-.how-it-works li {
-    background-color: var(--light-bg-color);
-    margin-bottom: 10px;
-    padding: 15px;
-    border-left: 5px solid var(--color-bright-blue-1);
-    border-radius: 4px;
-}
-
-/* ==================================== */
-/* 4. ESTILOS DE FORMULARIOS (GENERALES) */
-/* ==================================== */
-
-.login-body {
-    display: flex;
-    flex-direction: column;
     min-height: 100vh;
+    display: flex; flex-direction: column;
 }
 
-.login-container {
-    flex-grow: 1;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    padding: 20px;
+/* --- CORRECCIÓN AQUÍ: color: inherit --- */
+/* Esto evita que los enlaces se pongan azules/morados por defecto */
+a { 
+    text-decoration: none; 
+    transition: all 0.3s ease; 
+    color: inherit; 
+}
+ul { list-style: none; }
+
+/* 3. HEADER GLASSMORPHISM */
+.main-header {
+    background: var(--bg-card);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid rgba(56, 109, 189, 0.1);
+    padding: 0 2rem;
+    height: 80px;
+    display: flex; justify-content: space-between; align-items: center;
+    box-shadow: var(--shadow-sm);
+    position: sticky; top: 0; z-index: 100;
 }
 
-.login-box {
-    background-color: var(--text-light); 
-    padding: 40px;
-    border-radius: 8px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-    width: 100%;
-    max-width: 400px; 
-    text-align: center;
-}
-
-.login-box h2 {
-    color: var(--color-primary-dark);
-    margin-bottom: 25px;
-    font-size: 1.8rem;
-}
-
-.form-group {
-    margin-bottom: 20px;
-    text-align: left;
-}
-
-.form-group label {
-    display: block;
-    margin-bottom: 5px;
-    font-weight: bold;
-    color: var(--text-dark);
-}
-
-/* Estilo unificado para inputs de texto, email, password, textarea, select y number */
-.form-group input[type="email"],
-.form-group input[type="password"],
-.form-group input[type="text"],
-.form-group input[type="number"],
-.form-group textarea,
-.select-standard { 
-    width: 100%;
-    padding: 12px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    font-size: 1rem;
-    transition: border-color 0.3s;
-    box-sizing: border-box; 
-}
-
-.form-group input:focus,
-.form-group textarea:focus,
-.form-group .select-standard:focus {
-    border-color: var(--color-bright-blue-1);
-    outline: none;
-    box-shadow: 0 0 5px rgba(0, 157, 221, 0.5);
-}
-
-.form-group textarea {
-    resize: vertical;
-}
-
-.separator {
-    height: 1px;
-    background-color: #e0e0e0;
-    margin: 30px 0;
-}
-
-.new-user-text {
-    margin-bottom: 10px;
-    color: var(--text-dark);
-}
-
-
-/* ==================================== */
-/* 6. ESTILOS DASHBOARD Y TABS (Integrados y Corregidos) */
-/* ==================================== */
-
-.private-header {
-    background-color: var(--color-primary-dark);
-}
-
-.header-with-tabs {
-    /* Mantenemos grid para el Dashboard (Logo | Tabs Flexible | Iconos Usuario) */
-    display: grid;
-    grid-template-columns: auto 1fr auto; 
-    padding: 0 2%; 
-}
-
-/* --- User Navigation (Alineación Corregida para anclar a la derecha) --- */
-.user-nav {
-    display: flex;
-    align-items: center; 
-    gap: 15px;
-    padding: 1rem 0; 
-    /* ¡CORRECCIÓN CLAVE! Mantenemos los iconos a la derecha forzando la justificación */
-    justify-self: end;
-}
-
-.user-welcome {
-    color: var(--text-light);
-    font-size: 1rem;
-    padding-right: 15px;
-    border-right: 1px solid rgba(255, 255, 255, 0.3);
-}
-
-.nav-icon {
-    display: flex;
-    align-items: center;
-    gap: 5px;
-    font-size: 0.9rem; 
-    text-decoration: none;
-    color: var(--color-bright-blue-2); 
-    transition: color 0.2s;
-}
-
-.nav-icon:hover {
-    color: var(--text-light);
-}
-
-.btn-logout {
-    color: var(--danger-color);
-    font-weight: bold;
-}
-
-
-/* --- Main Tabs Container --- */
-.main-tabs-container {
-    display: flex;
-    align-items: stretch; 
-    justify-content: flex-start;
-    margin-left: 30px; 
-}
+.logo-image { height: 45px; transition: transform 0.3s;}
+.logo:hover .logo-image { transform: scale(1.05); }
 
 .tab-item {
-    padding: 20px 25px; 
-    text-decoration: none;
-    color: var(--text-light); 
-    font-weight: 600;
-    border-bottom: 4px solid transparent; 
-    transition: all 0.2s ease-in-out;
-    display: flex;
-    align-items: center;
-    height: 100%;
-}
-
-.tab-item:hover {
+    padding: 10px 25px;
+    border-radius: 50px;
     color: var(--text-light);
-    background-color: rgba(0, 0, 0, 0.1); 
+    font-weight: 600;
+    margin: 0 5px;
+    position: relative;
+    transition: all 0.3s;
+}
+.tab-item:hover { color: #386DBD; background: rgba(56, 109, 189, 0.05); }
+.tab-item.active { 
+    background: var(--primary-gradient); 
+    color: white; 
+    box-shadow: 0 4px 12px rgba(56, 109, 189, 0.3);
 }
 
-.tab-item.active {
-    color: var(--color-bright-blue-2); 
-    border-bottom-color: var(--color-bright-blue-2); 
-    background-color: transparent; 
+.user-nav { display: flex; align-items: center; gap: 15px; }
+.nav-icon { 
+    color: var(--text-main); font-weight: 500; font-size: 0.9rem;
+    padding: 8px 16px; border-radius: 12px;
+}
+.nav-icon:hover { background: white; box-shadow: var(--shadow-sm); transform: translateY(-2px); }
+.btn-logout { color: #dc3545 !important; }
+.btn-logout:hover { background: #fff5f5; }
+
+.user-icon { width: 35px; height: 35px; border-radius: 50%; border: 2px solid #e9ecef; object-fit: cover;}
+
+/* 4. LAYOUT Y TARJETAS */
+.dashboard-content, .login-container { 
+    flex: 1; width: 100%; max-width: 1200px; 
+    margin: 40px auto; padding: 0 20px; 
+    animation: fadeIn 0.6s ease-out;
 }
 
-/* --- Contenido del Dashboard --- */
-.dashboard-content {
-    padding: 30px 2%; 
-    min-height: 70vh;
-    background-color: white; 
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05); 
+.login-body {
+    background: var(--primary-gradient);
+    display: flex; align-items: center; justify-content: center;
 }
 
-.dashboard-content h2 {
-    color: var(--color-primary-dark);
-    margin-bottom: 20px;
-    border-bottom: 1px solid #eee;
-    padding-bottom: 10px;
+.form-card, .login-box {
+    background: var(--bg-card);
+    padding: 50px;
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-card);
+    border: 1px solid rgba(255,255,255,0.8);
 }
 
-
-/* ==================================== */
-/* 7. ESTILOS LISTADOS Y TABLAS (Solución Robusta con Inline-Block) */
-/* ==================================== */
-
-.header-listado {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 25px;
+/* 5. FORMULARIOS */
+.form-group { margin-bottom: 25px; position: relative; }
+.form-group label { 
+    font-size: 0.85rem; font-weight: 700; color: #495057; 
+    text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; display: block;
 }
 
+input[type="text"], input[type="email"], input[type="password"], textarea, select {
+    width: 100%; padding: 15px; 
+    background: #f8f9fa; border: 2px solid #e9ecef;
+    border-radius: 10px; font-size: 1rem; color: var(--text-main); font-family: 'Poppins', sans-serif;
+    transition: all 0.3s;
+}
+
+input:focus, select:focus, textarea:focus {
+    background: white; border-color: #386DBD; outline: none;
+    box-shadow: 0 0 0 4px rgba(56, 109, 189, 0.1);
+}
+
+/* 6. BOTONES */
+.btn { 
+    padding: 12px 28px; border-radius: 10px; font-weight: 600; letter-spacing: 0.5px;
+    cursor: pointer; border: none; display: inline-block; text-align: center;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.btn:hover { transform: translateY(-3px); box-shadow: 0 8px 15px rgba(56, 109, 189, 0.2); }
+.btn:active { transform: translateY(-1px); }
+
+.btn-primary { background: var(--primary-gradient); color: white; }
+.btn-create { background: var(--success-gradient); color: white; }
+.btn-secondary { background: white; color: var(--text-main); border: 2px solid #dee2e6; }
+.btn-full-width { width: 100%; margin-top: 10px; }
+
+/* 7. TABLA MODERNA */
 .data-table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-top: 20px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
-    background-color: white;
+    width: 100%; border-collapse: separate; border-spacing: 0 15px; 
+    background: transparent; box-shadow: none; overflow: visible;
 }
 
-.data-table th, .data-table td {
-    padding: 12px 15px;
-    text-align: left;
-    border-bottom: 1px solid #dee2e6;
-    vertical-align: middle; 
+.data-table thead th {
+    background: transparent; color: var(--text-light); font-weight: 600; text-transform: uppercase;
+    font-size: 0.8rem; letter-spacing: 1px; padding: 0 20px; border: none; text-align: center;
 }
+.data-table thead th:first-child { text-align: left; }
 
-.data-table th {
-    background-color: var(--light-bg-color); 
-    color: var(--color-primary-dark);
-    font-weight: 700;
-    text-transform: uppercase;
+.data-table tbody tr {
+    background: white; 
+    box-shadow: var(--shadow-sm);
+    border-radius: var(--radius);
+    transition: all 0.3s;
 }
 
 .data-table tbody tr:hover {
-    background-color: #f1f1f1;
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-hover);
+    border-left: 4px solid #386DBD;
 }
 
-/* Estado de Publicación */
-.status-tag {
-    padding: 4px 8px;
-    border-radius: 4px;
-    font-size: 0.85rem;
-    font-weight: bold;
-    display: inline-block;
-    vertical-align: middle;
+.data-table td {
+    padding: 20px; vertical-align: middle; border: none; text-align: center;
 }
-
-/* Contenedor de los botones CRUD (usamos inline-block y text-align) */
-.action-buttons {
-    white-space: nowrap; 
-    text-align: center; /* Alineación horizontal del grupo de iconos */
+.data-table td:first-child { 
+    text-align: left;
+    border-top-left-radius: var(--radius); border-bottom-left-radius: var(--radius); 
 }
+.data-table td:last-child { border-top-right-radius: var(--radius); border-bottom-right-radius: var(--radius); }
 
-/* Botones de acción como elementos en línea/bloque */
-.action-buttons a, .action-buttons form {
-    display: inline-block; 
-    margin: 0 4px; /* Espaciado entre iconos */
-    line-height: 1; 
-    vertical-align: middle;
-    padding: 0;
-}
-
-.btn-action {
-    background: none;
-    border: none;
-    cursor: pointer;
-    padding: 0;
-    line-height: 1;
-    display: block; 
-}
-
-.status-tag.publico {
-    background-color: var(--success-color);
-    color: var(--text-light);
-}
-
-.status-tag.privado {
-    background-color: var(--color-dark-bg);
-    color: var(--text-light);
-}
-
-.empty-list-message {
-    padding: 20px;
-    border: 1px dashed #ccc;
-    text-align: center;
-    color: var(--text-dark);
-}
-
-
-/* ==================================== */
-/* 8. ESTILOS DE IMÁGENES DE ICONOS (Limitación de Tamaño) */
-/* ==================================== */
-
-.icon-img {
-    display: block;
-    width: auto; 
-    line-height: 1; 
-}
-
-/* 8a. Iconos de Usuario (Perfil y Salir) en la cabecera */
-.user-icon {
-    height: 24px; 
-    width: auto;
-}
-
-/* 8b. Iconos CRUD (Editar y Borrar) en la tabla */
-.crud-icon {
-    height: 20px; 
-    width: auto;
-    vertical-align: middle;
-}
-
-/* ==================================== */
-/* 9. ESTILOS DE EDICIÓN (Página 6 y 7) */
-/* ==================================== */
-
-.edit-container {
-    max-width: 900px;
-    margin: 0 auto; 
-    padding-top: 20px;
-}
-
-.content-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 25px;
-}
-
-.content-header h1 {
-    font-size: 1.5rem;
-    border: none;
-    margin: 0;
-    padding: 0;
-}
-
-/* --- Sub-Navegación por Tabs --- */
-
-.sub-tab-navigation {
-    display: flex;
-    border-bottom: 2px solid #ccc;
-    margin-bottom: 30px;
-}
-
-.sub-tab-item {
-    padding: 12px 20px;
-    text-decoration: none;
-    color: var(--text-dark);
+/* --- CORRECCIÓN ESPECÍFICA PARA TÍTULOS DE TABLA --- */
+/* Forzamos que el enlace del título sea gris oscuro siempre, y azul al pasar el ratón */
+.data-table td a {
+    color: var(--text-main); /* Gris oscuro por defecto */
     font-weight: 600;
-    border: 1px solid transparent;
-    border-bottom: none;
-    transition: all 0.2s;
-    margin-right: 5px;
-    border-radius: 6px 6px 0 0;
+}
+.data-table td a:visited {
+    color: var(--text-main); /* Evita el morado */
+}
+.data-table td a:hover {
+    color: #386DBD; /* Azul UniQuiz solo al pasar el ratón */
 }
 
-.sub-tab-item:hover {
-    background-color: var(--light-bg-color);
+/* Tags */
+.status-tag { 
+    padding: 6px 12px; border-radius: 20px; font-size: 0.7rem; font-weight: 800; letter-spacing: 0.5px; 
+    display: inline-block;
+}
+.publico { background: #d4edda; color: #155724; }
+.privado { background: #e2e3e5; color: #383d41; }
+
+/* 8. BOTONES ACCIÓN */
+.actions-wrapper { display: flex; gap: 10px; justify-content: flex-end; }
+.actions-wrapper form { margin: 0; padding: 0; display: contents; }
+
+.btn-action.btn-sm-text {
+    width: 38px; height: 38px; padding: 0; border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0; 
+    transition: all 0.3s;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
 }
 
-.sub-tab-item.active {
-    background-color: white;
-    border-color: #ccc;
-    border-bottom: 2px solid white; /* Simula que el tab se une al contenido */
-    color: var(--color-primary-dark);
-    margin-bottom: -2px;
+.btn-info { background: #e7f5ff; color: #386DBD; }
+.btn-info::after { content: '👁️'; font-size: 1.1rem; }
+.btn-edit { background: #fff9db; color: #fcc419; }
+.btn-edit::after { content: '✏️'; font-size: 1.1rem; }
+.btn-del { background: #ffe3e3; color: #fa5252; }
+.btn-del::after { content: '🗑️'; font-size: 1.1rem; }
+
+.btn-action:hover { transform: scale(1.1); filter: brightness(0.95); }
+
+/* 9. PÁGINA PERFIL */
+.file-upload-wrapper {
+    background: #f8f9fa; border: 2px dashed #dee2e6; border-radius: var(--radius);
+    padding: 30px; text-align: center; transition: all 0.3s;
+}
+.file-upload-wrapper:hover { border-color: #386DBD; background: #e7f5ff; }
+
+.custom-file-upload { 
+    background: var(--primary-gradient); color: white; padding: 10px 20px; border-radius: 30px; 
+    border: none; font-size: 0.9rem;
+}
+.profile-preview { 
+    width: 120px; height: 120px; border-radius: 50%; border: 4px solid white; 
+    box-shadow: var(--shadow-card); object-fit: cover;
 }
 
-.sub-tab-content {
-    background-color: white;
-    padding: 20px;
-    border: 1px solid #ccc;
-    border-radius: 6px;
-    margin-bottom: 25px;
+/* 10. LANDING PAGE */
+.hero {
+    background: white; border-radius: var(--radius);
+    padding: 60px 40px; text-align: center;
+    box-shadow: var(--shadow-card); position: relative; overflow: hidden;
+}
+.hero::before {
+    content: ''; position: absolute; top: -50px; left: -50px;
+    width: 200px; height: 200px; background: var(--primary-gradient);
+    border-radius: 50%; opacity: 0.05;
+}
+.hero::after {
+    content: ''; position: absolute; bottom: -50px; right: -50px;
+    width: 300px; height: 300px; background: var(--accent-gradient);
+    border-radius: 50%; opacity: 0.1;
 }
 
-/* --- Tarjetas de Contenido y Formularios --- */
+.features-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 30px; margin-top: 50px; }
+.feature-item {
+    background: white; padding: 30px; border-radius: var(--radius);
+    box-shadow: var(--shadow-sm); border: 1px solid #f1f3f5;
+    transition: all 0.3s;
+}
+.feature-item:hover { transform: translateY(-10px); box-shadow: var(--shadow-hover); border-color: #386DBD; }
+.feature-item h3 { color: #386DBD; margin-bottom: 10px; }
 
-.form-card, .options-card {
-    background-color: white;
-    padding: 20px;
-    border: 1px solid #ccc;
-    border-radius: 6px;
-    margin-bottom: 25px;
+.main-footer {
+    text-align: center; padding: 30px; color: var(--text-light);
+    font-size: 0.9rem; margin-top: auto;
 }
 
-.form-card h3, .options-card h3 {
-    color: var(--color-primary-dark);
-    margin-bottom: 15px;
-    padding-bottom: 5px;
-    border-bottom: 1px dashed #eee;
-}
-
-.form-standard input[type="number"] {
-    /* Desactivar el width: 100% que hereda de la sección 4 */
-    width: auto !important; 
-    min-width: 100px;
-}
-
-.form-standard .checkbox-group,
-.form-standard .radio-group {
-    display: flex;
-    align-items: center;
-    margin-top: 15px;
-    margin-bottom: 25px;
-}
-
-.form-standard .checkbox-group label,
-.form-standard .radio-group label {
-    margin-right: 15px;
-    margin-bottom: 0;
-    font-weight: normal;
-}
-
-/* --- Listado de Preguntas/Opciones (Flexbox seguro) --- */
-
-.question-list, .option-list {
-    list-style: none;
-    padding: 0;
-    margin-top: 15px;
-}
-
-.question-item, .option-item {
-    display: flex; 
-    justify-content: space-between;
-    align-items: center;
-    padding: 15px 0;
-    border-bottom: 1px solid #f0f0f0;
-}
-
-.question-item:last-child, .option-item:last-child {
-    border-bottom: none;
-}
-
-.question-text, .option-text {
-    font-weight: 500;
-    margin: 0;
-    color: var(--text-dark);
-    flex-grow: 1; 
-    margin-right: 15px;
-}
-
-.option-item.correcta {
-    background-color: rgba(40, 167, 69, 0.05);
-    border-radius: 4px;
-    padding-left: 10px;
-}
+@keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }

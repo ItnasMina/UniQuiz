@@ -1,69 +1,63 @@
 <?php
-// UQ Lead Dev: index.php
-// Objetivo: Página de aterrizaje (Landing Page) para UniQuiz.
-// Nota: No se requiere session_start() ya que es una página pública.
-// Incluimos funciones esenciales (aunque estarán vacías por ahora)
+// UQ Lead Dev: index.php (LANDING REDISEÑADA)
+session_start();
+// Redirigir si ya está logueado
+if (isset($_SESSION['usuario_id'])) {
+    header("Location: vistas/dashboard.php");
+    exit;
+}
 ?>
-
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>UniQuiz - Plataforma de Cuestionarios para Universitarios</title>
-    <link rel="stylesheet" href="estilos/estilos.css">  
-    <link rel="icon" href="assets/LogoUQ.png" type="image/x-icon">
+    <title>Bienvenido a UniQuiz</title>
+    <link rel="stylesheet" href="estilos/estilos.css">
+    <link rel="icon" href="assets/LogoUQ.png" type="image/png">
 </head>
-<body>
+<body class="login-body"> <main class="login-container" style="max-width: 1000px;">
+        
+        <div class="hero">
+            <div style="margin-bottom: 20px;">
+                <img src="assets/LogoUQ-w&b.png" alt="UniQuiz Logo" style="height: 80px; filter: invert(0); opacity: 0.8;"> </div>
 
-    <header class="main-header">
-        <div class="logo">
-            <a href="index.php">
-                <img src="assets/LogoUQ-w&b.png" alt="Logo de UniQuiz" class="logo-image">
-            </a>
-        </div>
-        <nav class="main-nav">
-            <a href="vistas/login.php" class="btn btn-primary">Iniciar Sesión</a>
-            <a href="vistas/registro.php" class="btn btn-secondary">Registrarse</a>
-        </nav>
-    </header>
-
-    <main class="landing-main">
-        <section class="hero">
-            <h2>Domina tus Asignaturas con UniQuiz</h2>
-            <p class="tagline">La plataforma definitiva de creación y gestión de cuestionarios diseñada para la vida universitaria.</p>
+            <h1 style="font-size: 2.5rem; margin-bottom: 15px; background: var(--primary-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
+                Domina tus Asignaturas
+            </h1>
             
-            <div class="features-grid">
-                <div class="feature-item">
-                    <h3>💡 Crea y Personaliza</h3>
-                    <p>Diseña exámenes de práctica con preguntas de opción múltiple, verdadero/falso o texto abierto.</p>
-                </div>
-                <div class="feature-item">
-                    <h3>📚 Acceso Rápido</h3>
-                    <p>Comparte tus conocimientos o accede a cuestionarios públicos creados por otros compañeros.</p>
-                </div>
-                <div class="feature-item">
-                    <h3>📈 Haz Seguimiento</h3>
-                    <p>Gestiona tus propios cuestionarios y edítalos fácilmente con nuestra interfaz intuitiva.</p>
-                </div>
+            <p style="font-size: 1.1rem; color: #718096; max-width: 600px; margin: 0 auto 30px;">
+                La plataforma inteligente para crear, compartir y practicar exámenes universitarios con un diseño que te encantará.
+            </p>
+
+            <div style="display: flex; gap: 15px; justify-content: center; margin-bottom: 50px;">
+                <a href="vistas/registro.php" class="btn btn-primary" style="padding: 15px 40px; font-size: 1.1rem;">🚀 Empezar Gratis</a>
+                <a href="vistas/login.php" class="btn btn-secondary" style="padding: 15px 40px; font-size: 1.1rem;">Iniciar Sesión</a>
             </div>
 
-            <a href="vistas/registro.php" class="btn btn-call-to-action">¡Empieza Gratis Ahora!</a>
-        </section>
+            <div class="features-grid">
+                <div class="feature-item">
+                    <div style="font-size: 2rem; margin-bottom: 10px;">⚡</div>
+                    <h3>Rápido</h3>
+                    <p>Crea tests en segundos con nuestra interfaz intuitiva y moderna.</p>
+                </div>
+                <div class="feature-item">
+                    <div style="font-size: 2rem; margin-bottom: 10px;">🌍</div>
+                    <h3>Comunidad</h3>
+                    <p>Accede a cuestionarios públicos creados por otros estudiantes.</p>
+                </div>
+                <div class="feature-item">
+                    <div style="font-size: 2rem; margin-bottom: 10px;">📈</div>
+                    <h3>Progreso</h3>
+                    <p>Visualiza tus resultados y mejora nota asignatura a asignatura.</p>
+                </div>
+            </div>
+        </div>
 
-        <section class="how-it-works">
-            <h3>¿Cómo funciona UQ?</h3>
-            <p>En solo 3 pasos, estarás listo para estudiar:</p>
-            <ul>
-                <li>**Regístrate:** Crea tu cuenta universitaria en segundos.</li>
-                <li>**Crea/Busca:** Diseña tu propio cuestionario o busca entre los disponibles públicamente.</li>
-                <li>**Estudia:** Completa el quiz y prepárate para el éxito académico.</li>
-            </ul>
-        </section>
     </main>
-
-    <footer class="main-footer">
-        <p>&copy; <?php echo date("Y"); ?> UniQuiz. Todos los derechos reservados.</p>
+    
+    <footer style="text-align: center; color: rgba(255,255,255,0.8); padding: 20px; font-size: 0.85rem;">
+        &copy; 2026 UniQuiz. Diseñado para el éxito.
     </footer>
 
 </body>

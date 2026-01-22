@@ -1,6 +1,6 @@
 <?php
 // UQ Lead Dev: dashboard.php
-// Objetivo: Panel principal. Muestra cuestionarios REALES de la base de datos.
+// Objetivo: Panel principal mejorado con gestión de perfil y UX profesional.
 
 session_start();
 
@@ -15,6 +15,9 @@ require_once '../controladores/conexion.php';
 // Datos del usuario logueado
 $usuario_id = $_SESSION['usuario_id'];
 $nombre_usuario = $_SESSION['nombre_usuario'];
+// Foto de perfil: si no hay en sesión o es null, usar default
+$foto_perfil = !empty($_SESSION['foto_perfil']) ? $_SESSION['foto_perfil'] : 'default_user.png';
+
 $tab_activo = $_GET['tab'] ?? 'mis_cuestionarios';
 
 // Variables para la vista
@@ -25,7 +28,7 @@ try {
     if ($tab_activo == 'mis_cuestionarios') {
         $titulo_seccion = "Mis Cuestionarios Creados";
         
-        // CONSULTA A: Cuestionarios del usuario actual
+        // CONSULTA A: Mis cuestionarios
         $sql = "SELECT * FROM cuestionarios 
                 WHERE usuario_id = :uid 
                 ORDER BY fecha_creacion DESC";
@@ -34,10 +37,9 @@ try {
         $cuestionarios = $stmt->fetchAll();
 
     } elseif ($tab_activo == 'ver_cuestionarios') {
-        $titulo_seccion = "Explorar Cuestionarios Públicos";
+        $titulo_seccion = "Explorar Cuestionarios de la Comunidad";
         
-        // CONSULTA B: Cuestionarios públicos (JOIN para saber el autor)
-        // Excluimos los propios para que no salgan duplicados si también son públicos
+        // CONSULTA B: Cuestionarios públicos de otros (JOIN para saber autor)
         $sql = "SELECT c.*, u.nombre as autor 
                 FROM cuestionarios c
                 JOIN usuarios u ON c.usuario_id = u.id
@@ -48,10 +50,10 @@ try {
         $cuestionarios = $stmt->fetchAll();
     }
 } catch (PDOException $e) {
-    $error_db = "Error al cargar cuestionarios: " . $e->getMessage();
+    $error_db = "Error al cargar datos: " . $e->getMessage();
 }
 
-// Mensajes Flash (Feedback de acciones de borrar/crear)
+// Mensajes Flash
 $mensaje = '';
 if (isset($_SESSION['mensaje'])) {
     $mensaje = $_SESSION['mensaje'];
@@ -84,19 +86,15 @@ if (isset($_SESSION['mensaje'])) {
             </a>
             <a href="dashboard.php?tab=ver_cuestionarios" 
                class="tab-item <?php echo ($tab_activo == 'ver_cuestionarios') ? 'active' : ''; ?>">
-                Comunidad (Públicos)
+                Comunidad
             </a>
         </nav>
 
         <nav class="user-nav">
             <span class="user-welcome">Hola, <?php echo htmlspecialchars($nombre_usuario); ?></span>
             
-            <a href="perfil.php" class="nav-icon" title="Mi Perfil">
-                <?php if(!empty($_SESSION['foto_perfil']) && $_SESSION['foto_perfil'] != 'default_user.png'): ?>
-                    <img src="../almacen/<?php echo htmlspecialchars($_SESSION['foto_perfil']); ?>" class="icon-img user-icon" style="border-radius: 50%;">
-                <?php else: ?>
-                    <img src="../assets/IconoPerfil.png" alt="Mi Perfil" class="icon-img user-icon">
-                <?php endif; ?>
+            <a href="perfil.php" class="nav-icon" title="Editar mi Perfil">
+                <img src="../almacen/<?php echo htmlspecialchars($foto_perfil); ?>" class="icon-img user-icon" style="object-fit: cover;">
                 Mi Perfil 
             </a>
             
@@ -110,13 +108,13 @@ if (isset($_SESSION['mensaje'])) {
     <main class="dashboard-content">
         
         <?php if (!empty($mensaje)): ?>
-            <div style="background-color: #d4edda; color: #155724; padding: 10px; margin-bottom: 20px; border-radius: 4px;">
+            <div class="alert">
                 <?php echo htmlspecialchars($mensaje); ?>
             </div>
         <?php endif; ?>
 
         <?php if (isset($error_db)): ?>
-            <div style="color: red;"><?php echo $error_db; ?></div>
+            <div style="color: red; margin-bottom: 20px;"><?php echo $error_db; ?></div>
         <?php endif; ?>
 
         <div class="header-listado">
@@ -130,75 +128,95 @@ if (isset($_SESSION['mensaje'])) {
         </div>
         
         <?php if (empty($cuestionarios)): ?>
-            <p class="empty-list-message">
-                <?php echo ($tab_activo == 'mis_cuestionarios') 
-                    ? "Aún no has creado ningún cuestionario. ¡Empieza ahora!" 
-                    : "No hay cuestionarios públicos disponibles de otros usuarios."; ?>
-            </p>
+            <div class="form-card" style="text-align: center; color: #666;">
+                <p>
+                    <?php echo ($tab_activo == 'mis_cuestionarios') 
+                        ? "Aún no has creado ningún cuestionario. ¡Empieza ahora!" 
+                        : "No hay cuestionarios públicos disponibles de otros usuarios en este momento."; ?>
+                </p>
+            </div>
         <?php else: ?>
             <table class="data-table">
                 <thead>
                     <tr>
-                        <th>Título</th>
-                        <?php if ($tab_activo == 'ver_cuestionarios'): ?>
+                        <th style="width: 40%;">Título y Descripción</th> <?php if ($tab_activo == 'ver_cuestionarios'): ?>
                             <th>Autor</th>
                         <?php endif; ?>
-                        <th>Creado</th>
-                        <th>Estado</th>
-                        <th>Acciones</th>
-                    </tr>
+                        
+                        <th>Fecha Creación</th>
+                        
+                        <?php if ($tab_activo == 'mis_cuestionarios'): ?>
+                            <th>Estado</th>
+                        <?php endif; ?>
+
+                        <th>Acciones</th> </tr>
                 </thead>
                 <tbody>
                     <?php foreach ($cuestionarios as $cuestionario): ?>
                         <tr>
                             <td>
                                 <?php if ($tab_activo == 'mis_cuestionarios'): ?>
-                                    <a href="cuestionario_editar.php?id=<?php echo $cuestionario['id']; ?>">
-                                        <strong><?php echo htmlspecialchars($cuestionario['titulo']); ?></strong>
+                                    <a href="cuestionario_editar.php?id=<?php echo $cuestionario['id']; ?>" style="font-weight: bold; font-size: 1.05rem;">
+                                        <?php echo htmlspecialchars($cuestionario['titulo']); ?>
                                     </a>
                                 <?php else: ?>
-                                    <a href="cuestionario_realizar.php?id=<?php echo $cuestionario['id']; ?>">
+                                    <a href="cuestionario_realizar.php?id=<?php echo $cuestionario['id']; ?>" style="font-weight: bold; font-size: 1.05rem;">
                                         <?php echo htmlspecialchars($cuestionario['titulo']); ?>
                                     </a>
                                 <?php endif; ?>
                                 
                                 <br>
-                                <small style="color: #666;"><?php echo htmlspecialchars($cuestionario['descripcion']); ?></small>
+                                <small style="color: #7f8c8d;"><?php echo htmlspecialchars($cuestionario['descripcion']); ?></small>
                             </td>
 
                             <?php if ($tab_activo == 'ver_cuestionarios'): ?>
-                                <td><?php echo htmlspecialchars($cuestionario['autor']); ?></td>
+                                <td>
+                                    <span style="font-weight: 500; color: var(--secondary);">
+                                        <?php echo htmlspecialchars($cuestionario['autor']); ?>
+                                    </span>
+                                </td>
                             <?php endif; ?>
 
                             <td><?php echo date('d/m/Y', strtotime($cuestionario['fecha_creacion'])); ?></td>
                             
+                            <?php if ($tab_activo == 'mis_cuestionarios'): ?>
+                                <td>
+                                    <?php if ($cuestionario['es_publico']): ?>
+                                        <span class="status-tag publico">Público</span>
+                                    <?php else: ?>
+                                        <span class="status-tag privado">Privado</span>
+                                    <?php endif; ?>
+                                </td>
+                            <?php endif; ?>
+
                             <td>
-                                <?php if ($cuestionario['es_publico']): ?>
-                                    <span class="status-tag publico">Público</span>
-                                <?php else: ?>
-                                    <span class="status-tag privado">Privado</span>
-                                <?php endif; ?>
+                                <div class="actions-wrapper">
+                                    <?php if ($tab_activo == 'mis_cuestionarios'): ?>
+                                        
+                                        <a href="cuestionario_realizar.php?id=<?php echo $cuestionario['id']; ?>" class="btn-action btn-sm-text btn-info" title="Probar">
+                                            Ver
+                                        </a>
+
+                                        <a href="cuestionario_editar.php?id=<?php echo $cuestionario['id']; ?>" class="btn-action btn-sm-text btn-edit" title="Editar">
+                                            Editar
+                                        </a>
+                                        
+                                        <form action="../controladores/cuestionario_borrar.php" method="POST">
+                                            <input type="hidden" name="cuestionario_id" value="<?php echo $cuestionario['id']; ?>">
+                                            <button type="submit" class="btn-action btn-sm-text btn-del" title="Borrar" 
+                                                    onclick="return confirm('¿Estás seguro de borrar \u201C<?php echo htmlspecialchars($cuestionario['titulo']); ?>\u201D?');">
+                                                Borrar
+                                            </button>
+                                        </form>
+
+                                    <?php else: ?>
+                                        <a href="cuestionario_realizar.php?id=<?php echo $cuestionario['id']; ?>" class="btn btn-primary btn-sm" style="font-size: 0.85rem; padding: 5px 10px;">
+                                            Realizar
+                                        </a>
+                                    <?php endif; ?>
+                                </div>
                             </td>
 
-                            <td class="action-buttons">
-                                <?php if ($tab_activo == 'mis_cuestionarios'): ?>
-                                    <a href="cuestionario_editar.php?id=<?php echo $cuestionario['id']; ?>" class="btn-action" title="Editar">
-                                        <img src="../assets/IconoEditar.png" alt="Editar" class="icon-img crud-icon">
-                                    </a>
-                                    
-                                    <form action="../controladores/cuestionario_borrar.php" method="POST" style="display:inline;">
-                                        <input type="hidden" name="cuestionario_id" value="<?php echo $cuestionario['id']; ?>">
-                                        <button type="submit" class="btn-action btn-delete" title="Borrar" 
-                                                onclick="return confirm('¿Estás seguro de borrar \u201C<?php echo htmlspecialchars($cuestionario['titulo']); ?>\u201D? Se borrarán sus preguntas.');">
-                                            <img src="../assets/IconoPapelera.png" alt="Borrar" class="icon-img crud-icon">
-                                        </button>
-                                    </form>
-                                <?php else: ?>
-                                    <a href="cuestionario_realizar.php?id=<?php echo $cuestionario['id']; ?>" class="btn btn-primary btn-sm" style="padding: 5px 10px; font-size: 0.8rem;">
-                                        Realizar Test
-                                    </a>
-                                <?php endif; ?>
-                            </td>
                         </tr>
                     <?php endforeach; ?>
                 </tbody>
@@ -212,4 +230,4 @@ if (isset($_SESSION['mensaje'])) {
     </footer>
 
 </body>
-</html> 
+</html>
