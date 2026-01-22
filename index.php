@@ -12,7 +12,7 @@ include 'includes/funciones.php';
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>UniQuiz - Plataforma de Cuestionarios para Universitarios</title>
-    <link rel="stylesheet" href="css/estilos.css">
+    <link rel="stylesheet" href="estilos/estilos.css">  
     <link rel="icon" href="/assets/LogoUQ.png" type="image/x-icon">
 </head>
 <body>
@@ -25,8 +25,8 @@ include 'includes/funciones.php';
         </div>
         <nav class="main-nav">
             <a href="dashboard.php" class="active">Inicio</a>
-            <a href="login.php" class="btn btn-primary">Iniciar Sesión</a>
-            <a href="registro.php" class="btn btn-secondary">Registrarse</a>
+            <a href="vistas/login.php" class="btn btn-primary">Iniciar Sesión</a>
+            <a href="vistas/registro.php" class="btn btn-secondary">Registrarse</a>
         </nav>
     </header>
 

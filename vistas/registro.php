@@ -18,15 +18,15 @@ $mensaje_error = ''; // Variable para mostrar errores al usuario, si los hubiera
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Crear Cuenta en UniQuiz</title>
-    <link rel="stylesheet" href="css/estilos.css">
-    <link rel="icon" href="/assets/LogoUQ.png" type="image/x-icon">
+    <link rel="stylesheet" href="../estilos/estilos.css">
+    <link rel="icon" href="../assets/LogoUQ.png" type="image/x-icon">
 </head>
 <body class="login-body">
 
     <header class="main-header small-header">
         <div class="logo">
             <a href="index.php">
-                <img src="assets/LogoUQ-w&b.png" alt="Logo UniQuiz" class="logo-image">
+                <img src="../assets/LogoUQ-w&b.png" alt="Logo UniQuiz" class="logo-image">
             </a>
         </div>
     </header>

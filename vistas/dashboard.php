@@ -36,8 +36,8 @@ $cuestionarios_mock = [
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard | UniQuiz</title>
     
-    <link rel="stylesheet" href="css/estilos.css">
-    <link rel="icon" href="assets/LogoUQ.png" type="image/png"> 
+    <link rel="stylesheet" href="../estilos/estilos.css">
+    <link rel="icon" href="../assets/LogoUQ.png" type="image/png"> 
 </head>
 <body class="dashboard-body">
 
@@ -45,7 +45,7 @@ $cuestionarios_mock = [
         
         <div class="logo">
             <a href="dashboard.php">
-                <img src="assets/LogoUQ-w&b.png" alt="Logo UniQuiz con texto" class="logo-image">
+                <img src="../assets/LogoUQ-w&b.png" alt="Logo UniQuiz con texto" class="logo-image">
             </a>
         </div>
         
@@ -64,12 +64,12 @@ $cuestionarios_mock = [
             <span class="user-welcome">Hola, <?php echo htmlspecialchars($nombre_usuario); ?></span>
             
             <a href="perfil.php" class="nav-icon" title="Mi Perfil">
-                <img src="assets/IconoPerfil.png" alt="Mi Perfil" class="icon-img user-icon">
+                <img src="../assets/IconoPerfil.png" alt="Mi Perfil" class="icon-img user-icon">
                 Mi Perfil 
             </a>
             
             <a href="logout.php" class="nav-icon btn-logout" title="Cerrar Sesión">
-                <img src="assets/IconoSalir.png" alt="Cerrar Sesión" class="icon-img user-icon">
+                <img src="../assets/IconoSalir.png" alt="Cerrar Sesión" class="icon-img user-icon">
                 Salir 
             </a>
         </nav>
@@ -116,13 +116,13 @@ $cuestionarios_mock = [
                                     </td>
                                     <td class="action-buttons">
                                         <a href="cuestionario_editar.php?id=<?php echo $cuestionario['id']; ?>" class="btn-action" title="Editar">
-                                            <img src="assets/IconoEditar.png" alt="Editar" class="icon-img crud-icon">
+                                            <img src="../assets/IconoEditar.png" alt="Editar" class="icon-img crud-icon">
                                         </a>
                                         <form action="dashboard.php" method="POST">
                                             <input type="hidden" name="accion" value="borrar">
                                             <input type="hidden" name="cuestionario_id" value="<?php echo $cuestionario['id']; ?>">
                                             <button type="submit" class="btn-action btn-delete" title="Borrar" onclick="return confirm('¿Estás seguro de que deseas borrar este cuestionario?');">
-                                                <img src="assets/IconoPapelera.png" alt="Borrar" class="icon-img crud-icon">
+                                                <img src="../assets/IconoPapelera.png" alt="Borrar" class="icon-img crud-icon">
                                             </button>
                                         </form>
                                     </td>

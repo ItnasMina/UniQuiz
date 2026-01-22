@@ -17,14 +17,14 @@ $mensaje_error = ''; // Variable para mostrar errores al usuario, si los hubiera
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Iniciar Sesión en UniQuiz</title>
-    <link rel="stylesheet" href="css/estilos.css">
-    <link rel="icon" href="/assets/LogoUQ.png" type="image/x-icon">
+    <link rel="stylesheet" href="../estilos/estilos.css">
+    <link rel="icon" href="../assets/LogoUQ.png" type="image/x-icon">
 </head>
 <body class="login-body">
 
     <header class="main-header small-header">
         <div class="logo">
-            <a href="index.php" class="logo-link">UniQuiz (UQ)</a>
+            <a href="../index.php" class="logo-link">UniQuiz (UQ)</a>
         </div>
     </header>
 
