@@ -1,33 +1,62 @@
 <?php
 // UQ Lead Dev: dashboard.php
-// Objetivo: Página principal del área privada (Dashboard).
-// Muestra la navegación principal (Tabs), accesos de usuario y el contenido dinámico.
+// Objetivo: Panel principal. Muestra cuestionarios REALES de la base de datos.
 
-// REGLA DE ORO DE CODIFICACIÓN: Sesiones
 session_start();
 
-// Lógica de autenticación: Si el usuario no está logueado, redirigir.
-// if (!isset($_SESSION['usuario_id'])) {
-//     header("Location: login.php");
-//     exit;
-// }
+// 1. Seguridad: Verificar acceso
+if (!isset($_SESSION['usuario_id'])) {
+    header("Location: login.php");
+    exit;
+}
 
-// Simulamos los datos del usuario logueado para la cabecera
-$nombre_usuario = $_SESSION['nombre_usuario'] ?? 'Usuario UQ'; 
+require_once '../controladores/conexion.php';
 
-// Definimos el Tab activo por defecto (Página 5: Mis cuestionarios)
-$tab_activo = $_GET['tab'] ?? 'mis_cuestionarios'; 
+// Datos del usuario logueado
+$usuario_id = $_SESSION['usuario_id'];
+$nombre_usuario = $_SESSION['nombre_usuario'];
+$tab_activo = $_GET['tab'] ?? 'mis_cuestionarios';
 
-// Incluimos funciones esenciales (para futura lógica de base de datos)
-include '../include/funciones.php';
-// include 'includes/db.php'; // Se incluiría para obtener datos reales
+// Variables para la vista
+$cuestionarios = [];
+$titulo_seccion = "";
 
-// Datos simulados para el listado de cuestionarios (Página 5)
-$cuestionarios_mock = [
-    ['id' => 1, 'titulo' => 'Bases de Datos Avanzadas', 'preguntas' => 12, 'fecha' => '2025-10-01', 'publico' => true],
-    ['id' => 2, 'titulo' => 'Introducción a PHP y LAMP', 'preguntas' => 5, 'fecha' => '2025-10-15', 'publico' => false],
-    ['id' => 3, 'titulo' => 'Algoritmos de Ordenamiento', 'preguntas' => 20, 'fecha' => '2025-11-20', 'publico' => true],
-];
+try {
+    if ($tab_activo == 'mis_cuestionarios') {
+        $titulo_seccion = "Mis Cuestionarios Creados";
+        
+        // CONSULTA A: Cuestionarios del usuario actual
+        $sql = "SELECT * FROM cuestionarios 
+                WHERE usuario_id = :uid 
+                ORDER BY fecha_creacion DESC";
+        $stmt = $pdo->prepare($sql);
+        $stmt->execute(['uid' => $usuario_id]);
+        $cuestionarios = $stmt->fetchAll();
+
+    } elseif ($tab_activo == 'ver_cuestionarios') {
+        $titulo_seccion = "Explorar Cuestionarios Públicos";
+        
+        // CONSULTA B: Cuestionarios públicos (JOIN para saber el autor)
+        // Excluimos los propios para que no salgan duplicados si también son públicos
+        $sql = "SELECT c.*, u.nombre as autor 
+                FROM cuestionarios c
+                JOIN usuarios u ON c.usuario_id = u.id
+                WHERE c.es_publico = 1 AND c.usuario_id != :uid
+                ORDER BY c.fecha_creacion DESC";
+        $stmt = $pdo->prepare($sql);
+        $stmt->execute(['uid' => $usuario_id]);
+        $cuestionarios = $stmt->fetchAll();
+    }
+} catch (PDOException $e) {
+    $error_db = "Error al cargar cuestionarios: " . $e->getMessage();
+}
+
+// Mensajes Flash (Feedback de acciones de borrar/crear)
+$mensaje = '';
+if (isset($_SESSION['mensaje'])) {
+    $mensaje = $_SESSION['mensaje'];
+    unset($_SESSION['mensaje']);
+}
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -42,10 +71,9 @@ $cuestionarios_mock = [
 <body class="dashboard-body">
 
     <header class="main-header private-header header-with-tabs">
-        
         <div class="logo">
             <a href="dashboard.php">
-                <img src="../assets/LogoUQ-w&b.png" alt="Logo UniQuiz con texto" class="logo-image">
+                <img src="../assets/LogoUQ-w&b.png" alt="Logo UniQuiz" class="logo-image">
             </a>
         </div>
         
@@ -56,7 +84,7 @@ $cuestionarios_mock = [
             </a>
             <a href="dashboard.php?tab=ver_cuestionarios" 
                class="tab-item <?php echo ($tab_activo == 'ver_cuestionarios') ? 'active' : ''; ?>">
-                Ver Cuestionarios Públicos
+                Comunidad (Públicos)
             </a>
         </nav>
 
@@ -64,7 +92,11 @@ $cuestionarios_mock = [
             <span class="user-welcome">Hola, <?php echo htmlspecialchars($nombre_usuario); ?></span>
             
             <a href="perfil.php" class="nav-icon" title="Mi Perfil">
-                <img src="../assets/IconoPerfil.png" alt="Mi Perfil" class="icon-img user-icon">
+                <?php if(!empty($_SESSION['foto_perfil']) && $_SESSION['foto_perfil'] != 'default_user.png'): ?>
+                    <img src="../almacen/<?php echo htmlspecialchars($_SESSION['foto_perfil']); ?>" class="icon-img user-icon" style="border-radius: 50%;">
+                <?php else: ?>
+                    <img src="../assets/IconoPerfil.png" alt="Mi Perfil" class="icon-img user-icon">
+                <?php endif; ?>
                 Mi Perfil 
             </a>
             
@@ -77,68 +109,100 @@ $cuestionarios_mock = [
     
     <main class="dashboard-content">
         
-        <?php if ($tab_activo == 'mis_cuestionarios'): ?>
-            <section class="tab-panel active">
-                <div class="header-listado">
-                    <h2>Mis Cuestionarios Creados</h2>
-                    <a href="cuestionario_crear.php" class="btn btn-create">
-                        + Crear Nuevo
-                    </a>
-                </div>
-                
-                <?php if (empty($cuestionarios_mock)): ?>
-                    <p class="empty-list-message">Aún no has creado ningún cuestionario. ¡Empieza ahora!</p>
-                <?php else: ?>
-                    <table class="data-table">
-                        <thead>
-                            <tr>
-                                <th>Título</th>
-                                <th># Preguntas</th>
-                                <th>Creado en</th>
-                                <th>Estado</th>
-                                <th>Acciones</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <?php foreach ($cuestionarios_mock as $cuestionario): ?>
-                                <tr>
-                                    <td>
-                                        <a href="cuestionario_ver.php?id=<?php echo $cuestionario['id']; ?>">
-                                            <?php echo htmlspecialchars($cuestionario['titulo']); ?>
-                                        </a>
-                                    </td>
-                                    <td><?php echo $cuestionario['preguntas']; ?></td>
-                                    <td><?php echo $cuestionario['fecha']; ?></td>
-                                    <td>
-                                        <span class="status-tag <?php echo $cuestionario['publico'] ? 'publico' : 'privado'; ?>">
-                                            <?php echo $cuestionario['publico'] ? 'Público' : 'Privado'; ?>
-                                        </span>
-                                    </td>
-                                    <td class="action-buttons">
-                                        <a href="cuestionario_editar.php?id=<?php echo $cuestionario['id']; ?>" class="btn-action" title="Editar">
-                                            <img src="../assets/IconoEditar.png" alt="Editar" class="icon-img crud-icon">
-                                        </a>
-                                        <form action="dashboard.php" method="POST">
-                                            <input type="hidden" name="accion" value="borrar">
-                                            <input type="hidden" name="cuestionario_id" value="<?php echo $cuestionario['id']; ?>">
-                                            <button type="submit" class="btn-action btn-delete" title="Borrar" onclick="return confirm('¿Estás seguro de que deseas borrar este cuestionario?');">
-                                                <img src="../assets/IconoPapelera.png" alt="Borrar" class="icon-img crud-icon">
-                                            </button>
-                                        </form>
-                                    </td>
-                                </tr>
-                            <?php endforeach; ?>
-                        </tbody>
-                    </table>
-                <?php endif; ?>
-            </section>
+        <?php if (!empty($mensaje)): ?>
+            <div style="background-color: #d4edda; color: #155724; padding: 10px; margin-bottom: 20px; border-radius: 4px;">
+                <?php echo htmlspecialchars($mensaje); ?>
+            </div>
+        <?php endif; ?>
 
-        <?php elseif ($tab_activo == 'ver_cuestionarios'): ?>
-            <section class="tab-panel active">
-                <h2>Explorar Cuestionarios Públicos</h2>
-                <p>Aquí verás el listado de cuestionarios que han sido marcados como públicos por otros usuarios, listos para ser respondidos.</p>
-                </section>
+        <?php if (isset($error_db)): ?>
+            <div style="color: red;"><?php echo $error_db; ?></div>
+        <?php endif; ?>
+
+        <div class="header-listado">
+            <h2><?php echo $titulo_seccion; ?></h2>
+            
+            <?php if ($tab_activo == 'mis_cuestionarios'): ?>
+                <a href="cuestionario_crear.php" class="btn btn-create">
+                    + Crear Nuevo
+                </a>
+            <?php endif; ?>
+        </div>
         
+        <?php if (empty($cuestionarios)): ?>
+            <p class="empty-list-message">
+                <?php echo ($tab_activo == 'mis_cuestionarios') 
+                    ? "Aún no has creado ningún cuestionario. ¡Empieza ahora!" 
+                    : "No hay cuestionarios públicos disponibles de otros usuarios."; ?>
+            </p>
+        <?php else: ?>
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Título</th>
+                        <?php if ($tab_activo == 'ver_cuestionarios'): ?>
+                            <th>Autor</th>
+                        <?php endif; ?>
+                        <th>Creado</th>
+                        <th>Estado</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php foreach ($cuestionarios as $cuestionario): ?>
+                        <tr>
+                            <td>
+                                <?php if ($tab_activo == 'mis_cuestionarios'): ?>
+                                    <a href="cuestionario_editar.php?id=<?php echo $cuestionario['id']; ?>">
+                                        <strong><?php echo htmlspecialchars($cuestionario['titulo']); ?></strong>
+                                    </a>
+                                <?php else: ?>
+                                    <a href="cuestionario_realizar.php?id=<?php echo $cuestionario['id']; ?>">
+                                        <?php echo htmlspecialchars($cuestionario['titulo']); ?>
+                                    </a>
+                                <?php endif; ?>
+                                
+                                <br>
+                                <small style="color: #666;"><?php echo htmlspecialchars($cuestionario['descripcion']); ?></small>
+                            </td>
+
+                            <?php if ($tab_activo == 'ver_cuestionarios'): ?>
+                                <td><?php echo htmlspecialchars($cuestionario['autor']); ?></td>
+                            <?php endif; ?>
+
+                            <td><?php echo date('d/m/Y', strtotime($cuestionario['fecha_creacion'])); ?></td>
+                            
+                            <td>
+                                <?php if ($cuestionario['es_publico']): ?>
+                                    <span class="status-tag publico">Público</span>
+                                <?php else: ?>
+                                    <span class="status-tag privado">Privado</span>
+                                <?php endif; ?>
+                            </td>
+
+                            <td class="action-buttons">
+                                <?php if ($tab_activo == 'mis_cuestionarios'): ?>
+                                    <a href="cuestionario_editar.php?id=<?php echo $cuestionario['id']; ?>" class="btn-action" title="Editar">
+                                        <img src="../assets/IconoEditar.png" alt="Editar" class="icon-img crud-icon">
+                                    </a>
+                                    
+                                    <form action="../controladores/cuestionario_borrar.php" method="POST" style="display:inline;">
+                                        <input type="hidden" name="cuestionario_id" value="<?php echo $cuestionario['id']; ?>">
+                                        <button type="submit" class="btn-action btn-delete" title="Borrar" 
+                                                onclick="return confirm('¿Estás seguro de borrar \u201C<?php echo htmlspecialchars($cuestionario['titulo']); ?>\u201D? Se borrarán sus preguntas.');">
+                                            <img src="../assets/IconoPapelera.png" alt="Borrar" class="icon-img crud-icon">
+                                        </button>
+                                    </form>
+                                <?php else: ?>
+                                    <a href="cuestionario_realizar.php?id=<?php echo $cuestionario['id']; ?>" class="btn btn-primary btn-sm" style="padding: 5px 10px; font-size: 0.8rem;">
+                                        Realizar Test
+                                    </a>
+                                <?php endif; ?>
+                            </td>
+                        </tr>
+                    <?php endforeach; ?>
+                </tbody>
+            </table>
         <?php endif; ?>
 
     </main>
@@ -148,4 +212,4 @@ $cuestionarios_mock = [
     </footer>
 
 </body>
-</html>
+</html> 

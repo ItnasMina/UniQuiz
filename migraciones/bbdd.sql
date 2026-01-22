@@ -81,10 +81,6 @@ CREATE TABLE IF NOT EXISTS resultados (
 -- Para que no empieces con la BBDD vacía al probar el código PHP
 -- --------------------------------------------------------
 
--- Usuario: pass = '12345678' (hash de ejemplo, en producción usar password_hash)
-INSERT INTO usuarios (nombre, email, password, foto_perfil) VALUES 
-('Estudiante Demo', 'demo@upm.es', '$2y$10$e.g./w.e.g.HASH_GENERICO_PARA_12345678', 'default_user.png');
-
 -- Cuestionario de prueba
 INSERT INTO cuestionarios (usuario_id, titulo, descripcion, es_publico) VALUES 
 (1, 'Bases de Datos Avanzadas', 'Preguntas sobre SQL y diseño relacional.', 1),
