@@ -2,7 +2,7 @@
 // UQ Lead Dev: registro.php
 // Objetivo: Manejar el formulario de registro de nuevo usuario.
 
-include 'includes/funciones.php';
+include '../include/funciones.php';
 
 $mensaje_error = ''; // Variable para mostrar errores al usuario, si los hubiera.
 

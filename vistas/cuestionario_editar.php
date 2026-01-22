@@ -12,7 +12,7 @@ $cuestionario_titulo = "Título del Cuestionario #{$cuestionario_id}"; // Simula
 // Definimos el Tab interno activo
 $sub_tab_activo = $_GET['subtab'] ?? 'ajustes'; 
 
-include 'includes/funciones.php';
+include '../include/funciones.php';
 // if (!$cuestionario_id || !usuario_tiene_acceso($cuestionario_id)) { 
 //     header("Location: dashboard.php");
 //     exit;

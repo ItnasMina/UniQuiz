@@ -19,7 +19,7 @@ $nombre_usuario = $_SESSION['nombre_usuario'] ?? 'Usuario UQ';
 $tab_activo = $_GET['tab'] ?? 'mis_cuestionarios'; 
 
 // Incluimos funciones esenciales (para futura lógica de base de datos)
-include 'includes/funciones.php';
+include '../include/funciones.php';
 // include 'includes/db.php'; // Se incluiría para obtener datos reales
 
 // Datos simulados para el listado de cuestionarios (Página 5)

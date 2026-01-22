@@ -3,7 +3,7 @@
 // Objetivo: Manejar el formulario de inicio de sesión y enlazar al registro.
 
 // Incluimos funciones esenciales (aunque no se usan para la maquetación)
-include 'includes/funciones.php';
+include '../include/funciones.php';
 // Nota: session_start() se incluiría aquí si estuviéramos procesando el login.
 
 $mensaje_error = ''; // Variable para mostrar errores al usuario, si los hubiera.

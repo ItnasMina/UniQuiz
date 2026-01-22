@@ -1,6 +1,10 @@
-<!--// UQ Lead Dev: index.php
+<?php
+// UQ Lead Dev: index.php
 // Objetivo: Página de aterrizaje (Landing Page) para UniQuiz.
--->
+// Nota: No se requiere session_start() ya que es una página pública.
+// Incluimos funciones esenciales (aunque estarán vacías por ahora)
+include 'include/funciones.php';
+?>
 
 <!DOCTYPE html>
 <html lang="es">
@@ -46,7 +50,7 @@
                 </div>
             </div>
 
-            <a href="registro.php" class="btn btn-call-to-action">¡Empieza Gratis Ahora!</a>
+            <a href="vistas/registro.php" class="btn btn-call-to-action">¡Empieza Gratis Ahora!</a>
         </section>
 
         <section class="how-it-works">
