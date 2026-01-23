@@ -1,5 +1,7 @@
 <?php
-// UQ Lead Dev: perfil.php (AGRUPACIÓN INTELIGENTE: MEDIA DIARIA vs MEDIA HORARIA)
+// UQ Lead Dev: vistas/perfil.php
+// Objetivo: Perfil de usuario con gestión de foto en carpeta 'perfiles' y gráficas.
+
 session_start();
 require_once '../controladores/conexion.php';
 
@@ -29,7 +31,7 @@ $stmtH = $pdo->prepare($sqlHistorial);
 $stmtH->execute(['uid' => $usuario_id]);
 $historial = $stmtH->fetchAll(PDO::FETCH_ASSOC);
 
-// 3. Lista de Cuestionarios Únicos
+// 3. Lista de Cuestionarios Únicos para el filtro
 $cuestionarios_unicos = [];
 foreach ($historial as $h) {
     if (!isset($cuestionarios_unicos[$h['quest_id']])) {
@@ -90,11 +92,15 @@ $json_historial = json_encode($historial);
     <main class="dashboard-content" style="max-width: 1000px;">
         
         <div style="text-align: center; margin-bottom: 20px;">
-            <?php if (!empty($usuario['avatar'])): ?>
-                <img src="../perfiles/<?php echo htmlspecialchars($usuario['avatar']); ?>" class="profile-preview" style="width: 150px; height: 150px;">
+            <?php if (!empty($usuario['foto_perfil']) && $usuario['foto_perfil'] != 'default_user.png'): ?>
+                <img src="../perfiles/<?php echo htmlspecialchars($usuario['foto_perfil']); ?>" 
+                     class="profile-preview" style="width: 150px; height: 150px; object-fit: cover;">
             <?php else: ?>
-                <div class="profile-preview" style="width: 150px; height: 150px; background: #ddd; display: flex; align-items: center; justify-content: center; margin: 0 auto; font-size: 3rem;">👤</div>
+                <div class="profile-preview" style="width: 150px; height: 150px; background: #ddd; display: flex; align-items: center; justify-content: center; margin: 0 auto; font-size: 3rem; color: #666;">
+                    👤
+                </div>
             <?php endif; ?>
+            
             <h1 style="margin-top: 15px; color: var(--primary);"><?php echo htmlspecialchars($usuario['nombre']); ?></h1>
             <p style="color: var(--text-light);"><?php echo htmlspecialchars($usuario['email']); ?></p>
         </div>
@@ -158,7 +164,6 @@ $json_historial = json_encode($historial);
     <footer class="main-footer"><p>&copy; 2026 UniQuiz.</p></footer>
 
     <script>
-        // --- UTILIDADES ---
         function openTab(evt, tabName) {
             var i, tabcontent, tablinks;
             tabcontent = document.getElementsByClassName("tab-content");
@@ -178,7 +183,6 @@ $json_historial = json_encode($historial);
             }
         }
 
-        // --- LÓGICA GRÁFICA ---
         const rawData = <?php echo $json_historial; ?>;
         const availableQuizzes = <?php echo json_encode($cuestionarios_unicos); ?>;
         let myChart = null;
@@ -187,10 +191,7 @@ $json_historial = json_encode($historial);
             { border: '#386DBD', bg: 'rgba(56, 109, 189, 0.1)' },
             { border: '#e74c3c', bg: 'rgba(231, 76, 60, 0.1)' },
             { border: '#2ecc71', bg: 'rgba(46, 204, 113, 0.1)' },
-            { border: '#f1c40f', bg: 'rgba(241, 196, 15, 0.1)' },
-            { border: '#9b59b6', bg: 'rgba(155, 89, 182, 0.1)' },
-            { border: '#e67e22', bg: 'rgba(230, 126, 34, 0.1)' },
-            { border: '#34495e', bg: 'rgba(52, 73, 94, 0.1)' }
+            { border: '#f1c40f', bg: 'rgba(241, 196, 15, 0.1)' }
         ];
 
         function getColor(index) { return colorPalette[index % colorPalette.length]; }
@@ -222,43 +223,13 @@ $json_historial = json_encode($historial);
                         x: { 
                             type: 'time',
                             time: {
-                                // Quitamos unit: 'day' para que Chart.js decida solo (días u horas)
-                                displayFormats: { 
-                                    hour: 'HH:mm',
-                                    day: 'dd/MM'
-                                },
+                                displayFormats: { hour: 'HH:mm', day: 'dd/MM' },
                                 tooltipFormat: 'dd/MM/yyyy HH:mm'
                             },
                             grid: { display: false }
                         }
                     },
-                    plugins: {
-                        legend: { display: true, position: 'bottom' },
-                        tooltip: { 
-                            mode: 'nearest', 
-                            intersect: false,
-                            callbacks: {
-                                title: function(context) {
-                                    const date = new Date(context[0].parsed.x);
-                                    const timeRange = document.getElementById('timeRange').value;
-                                    
-                                    if(timeRange === '1') {
-                                        // Muestra hora en modo 24h
-                                        return date.toLocaleTimeString("es-ES", {hour: '2-digit', minute:'2-digit'}) + ' (Media Horaria)';
-                                    } else {
-                                        // Muestra día en modo 7d, 30d, etc.
-                                        return date.toLocaleDateString("es-ES") + ' (Media Diaria)';
-                                    }
-                                }
-                            }
-                        }
-                    },
-                    elements: {
-                        line: {
-                            tension: 0.3,
-                            borderJoinStyle: 'round'
-                        }
-                    }
+                    plugins: { legend: { display: true, position: 'bottom' } }
                 }
             });
             updateChartData();
@@ -269,7 +240,6 @@ $json_historial = json_encode($historial);
             const now = new Date();
             let minDate = null; 
 
-            // 1. Establecer el rango de tiempo (Zoom)
             if (timeRange !== 'all') {
                 const days = parseInt(timeRange);
                 const cutDate = new Date();
@@ -277,8 +247,7 @@ $json_historial = json_encode($historial);
                 minDate = cutDate.getTime();
             } else {
                 if (rawData.length > 0) {
-                    minDate = new Date(rawData[0].fecha_iso).getTime();
-                    minDate = minDate - (24*60*60*1000); 
+                    minDate = new Date(rawData[0].fecha_iso).getTime() - (24*60*60*1000); 
                 } else {
                     minDate = now.getTime();
                 }
@@ -288,60 +257,40 @@ $json_historial = json_encode($historial);
             myChart.options.scales.x.min = minDate;
             myChart.options.scales.x.max = now.getTime();
 
-            // 2. Definir modo de agrupación
-            // Si es '1' (24h) -> Agrupamos por Hora.
-            // Si es cualquier otro ('7', '30', '90', 'all') -> Agrupamos por Día.
             const groupMode = (timeRange === '1') ? 'hourly' : 'daily';
-
             const checkboxes = document.querySelectorAll('.quiz-filter-container input[type="checkbox"]');
             const newDatasets = [];
 
             checkboxes.forEach((cb, index) => {
                 if (!cb.checked) return;
-
                 const qId = cb.value;
                 const qTitle = availableQuizzes[qId];
                 const color = getColor(index);
 
-                // Filtrar datos brutos dentro del rango
                 let filteredData = rawData
                     .filter(r => r.quest_id == qId)
                     .filter(r => new Date(r.fecha_iso).getTime() >= minDate);
 
                 let chartData = [];
-
-                // 3. Lógica de Agrupación (Media)
                 const groupedData = {};
 
                 filteredData.forEach(r => {
                     let key;
                     if (groupMode === 'hourly') {
-                        // Cortamos en la 'T' y luego en ':' para obtener YYYY-MM-DDTHH
-                        // formato fecha_iso: 2023-10-25T14:30:00
-                        // key resultante: 2023-10-25T14
                         key = r.fecha_iso.split(':')[0]; 
                     } else {
-                        // Cortamos en la 'T' para obtener YYYY-MM-DD
                         key = r.fecha_iso.split('T')[0];
                     }
-
                     if (!groupedData[key]) { groupedData[key] = { sum: 0, count: 0 }; }
                     groupedData[key].sum += parseFloat(r.puntuacion);
                     groupedData[key].count++;
                 });
 
-                // Convertir grupos a puntos {x, y}
                 chartData = Object.keys(groupedData).map(keyStr => {
                     const avg = groupedData[keyStr].sum / groupedData[keyStr].count;
-                    
-                    // Si es hora, añadimos :00:00 para que el Date lo parsee bien como hora exacta
                     let dateStr = keyStr;
                     if(groupMode === 'hourly') dateStr += ":00:00"; 
-
-                    return { 
-                        x: new Date(dateStr).getTime(), 
-                        y: parseFloat(avg.toFixed(2)) 
-                    };
+                    return { x: new Date(dateStr).getTime(), y: parseFloat(avg.toFixed(2)) };
                 });
 
                 if (chartData.length > 0) {
@@ -352,9 +301,7 @@ $json_historial = json_encode($historial);
                         backgroundColor: color.bg,
                         borderWidth: 2,
                         pointRadius: 5,
-                        pointHoverRadius: 7,
-                        fill: false,
-                        cubicInterpolationMode: 'monotone'
+                        fill: false
                     });
                 }
             });

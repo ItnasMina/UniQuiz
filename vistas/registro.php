@@ -1,10 +1,14 @@
 <?php
-// UQ Lead Dev: registro.php (DISEÑO BLUE IDENTITY)
+// UQ Lead Dev: registro.php (CORREGIDO: Añadido campo confirmar contraseña)
 session_start();
 if (isset($_SESSION['usuario_id'])) {
     header("Location: dashboard.php");
     exit;
 }
+
+// Gestión de errores de sesión
+$error = $_SESSION['error_registro'] ?? '';
+unset($_SESSION['error_registro']);
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -19,13 +23,20 @@ if (isset($_SESSION['usuario_id'])) {
 
     <main class="login-container">
         
-        <div class="login-box" style="max-width: 500px;"> <div style="text-align: center; margin-bottom: 30px;">
+        <div class="login-box" style="max-width: 500px;"> 
+            <div style="text-align: center; margin-bottom: 30px;">
                 <a href="../index.php">
                     <img src="../assets/LogoUQ-w&b.png" alt="UniQuiz" style="height: 60px;">
                 </a>
                 <h2 style="margin-top: 15px; color: #386DBD; font-weight: 700;">Crear Cuenta Nueva</h2>
                 <p style="color: #6c757d; font-size: 0.9rem;">Únete a la comunidad universitaria</p>
             </div>
+
+            <?php if ($error): ?>
+                <div class="alert" style="background-color: #ffe3e3; color: #c92a2a; border: 1px solid #ffc9c9; margin-bottom: 20px; text-align: center;">
+                    <?php echo htmlspecialchars($error); ?>
+                </div>
+            <?php endif; ?>
 
             <form action="../controladores/usuario_registro.php" method="POST">
                 
@@ -42,6 +53,11 @@ if (isset($_SESSION['usuario_id'])) {
                 <div class="form-group">
                     <label for="password">Contraseña</label>
                     <input type="password" id="password" name="password" placeholder="Mínimo 8 caracteres" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="password_confirm">Confirmar Contraseña</label>
+                    <input type="password" id="password_confirm" name="password_confirm" placeholder="Repite tu contraseña" required>
                 </div>
                 
                 <button type="submit" class="btn btn-primary btn-full-width">

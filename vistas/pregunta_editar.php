@@ -1,5 +1,5 @@
 <?php
-// UQ Lead Dev: pregunta_editar.php (CON SOPORTE V/F)
+// UQ Lead Dev: pregunta_editar.php (SIN OPCIÓN DE BORRAR IMAGEN)
 session_start();
 require_once '../controladores/conexion.php';
 
@@ -31,15 +31,13 @@ $stmtOpt = $pdo->prepare("SELECT * FROM opciones WHERE pregunta_id = :pid ORDER 
 $stmtOpt->execute(['pid' => $pregunta_id]);
 $opciones = $stmtOpt->fetchAll();
 
-// 4. DETECTAR TIPO DE PREGUNTA (Lógica Inteligente)
-// Contamos cuántas opciones tienen texto real
+// 4. Detectar tipo
 $opciones_validas = 0;
 foreach($opciones as $opt) {
     if (!empty(trim($opt['texto_opcion']))) {
         $opciones_validas++;
     }
 }
-// Si hay 2 o menos opciones válidas, asumimos V/F. Si no, Múltiple.
 $es_vf = ($opciones_validas <= 2);
 ?>
 <!DOCTYPE html>
@@ -51,7 +49,9 @@ $es_vf = ($opciones_validas <= 2);
     <link rel="stylesheet" href="../estilos/estilos.css">
     <link rel="icon" href="../assets/LogoUQ.png" type="image/png">
 </head>
-<body class="dashboard-body" onload="toggleQuestionType()"> <header class="main-header private-header small-header">
+<body class="dashboard-body" onload="toggleQuestionType()"> 
+
+    <header class="main-header private-header small-header">
         <div class="logo">
             <a href="dashboard.php"><img src="../assets/LogoUQ-w&b.png" alt="Logo" class="logo-image"></a>
         </div>
@@ -83,18 +83,18 @@ $es_vf = ($opciones_validas <= 2);
 
                 <div class="form-group">
                     <label>Imagen</label>
+                    
                     <?php if(!empty($pregunta['imagen'])): ?>
-                        <div style="margin-bottom: 10px; display:flex; align-items:center; gap:15px;">
-                            <img src="../almacen/<?php echo htmlspecialchars($pregunta['imagen']); ?>" style="height: 80px; border-radius: 6px; border:1px solid #ddd;">
-                            <label style="font-weight: normal; font-size: 0.9rem; cursor: pointer; color: #dc3545;">
-                                <input type="checkbox" name="borrar_imagen" value="1"> 🗑️ Borrar esta imagen
-                            </label>
+                        <div style="margin-bottom: 15px; padding: 10px; background: #f8f9fa; border-radius: 8px; border: 1px solid #eee;">
+                            <p style="font-size: 0.85rem; color: #666; margin-bottom: 8px; font-weight: 600;">IMAGEN ACTUAL:</p>
+                            <img src="../almacen/<?php echo htmlspecialchars($pregunta['imagen']); ?>" 
+                                 style="height: 120px; border-radius: 6px; border: 1px solid #ddd; display: block;">
                         </div>
                     <?php endif; ?>
 
                     <div class="file-upload-wrapper">
                         <input type="file" id="img-input" name="imagen" accept="image/*" onchange="previewFile()">
-                        <label for="img-input" class="custom-file-upload">🔄 Cambiar Imagen</label>
+                        <label for="img-input" class="custom-file-upload">🔄 Sustituir Imagen</label>
                         <span id="file-name" style="display:block; margin-top:10px; color:#666; font-size:0.9rem;"></span>
                     </div>
                 </div>
@@ -123,9 +123,8 @@ $es_vf = ($opciones_validas <= 2);
                         $opt = $opciones[$i] ?? null;
                         $texto = $opt ? $opt['texto_opcion'] : '';
                         $es_correcta = $opt ? $opt['es_correcta'] : 0;
-                        $opt_id = $opt ? $opt['id'] : ''; // Si es nueva (caso raro), irá vacía
+                        $opt_id = $opt ? $opt['id'] : '';
                         
-                        // Clase especial para ocultar la 3 y 4 con JS
                         $extraClass = ($i >= 2) ? 'extra-option' : '';
                     ?>
                     <div class="form-group-option <?php echo $extraClass; ?>" style="margin-bottom: 15px;">
@@ -159,39 +158,32 @@ $es_vf = ($opciones_validas <= 2);
             const input = document.getElementById('img-input');
             const fileName = document.getElementById('file-name');
             if(input.files.length > 0){
-                fileName.textContent = "Nueva imagen: " + input.files[0].name;
+                fileName.textContent = "Se subirá: " + input.files[0].name;
                 fileName.style.color = "#28a745";
                 fileName.style.fontWeight = "600";
             }
         }
 
-        // Lógica para mostrar/ocultar campos según V/F o Múltiple
         function toggleQuestionType() {
             const isVF = document.getElementById('type-vf').checked;
             const extraOptions = document.querySelectorAll('.extra-option');
             
-            const input1 = document.getElementById('opt_0'); // Ojo: arrays PHP empiezan en 0
+            const input1 = document.getElementById('opt_0'); 
             const input2 = document.getElementById('opt_1');
             const input3 = document.getElementById('opt_2');
             const input4 = document.getElementById('opt_3');
 
             if (isVF) {
-                // MODO V/F
                 extraOptions.forEach(div => div.style.display = 'none');
                 
-                // Quitar required y limpiar valores de las ocultas
                 if(input3) { input3.required = false; input3.value = ""; }
                 if(input4) { input4.required = false; input4.value = ""; }
 
-                // Si están vacíos, sugerir V/F (útil si cambian de tipo)
                 if(input1 && input1.value === "") input1.value = "Verdadero";
                 if(input2 && input2.value === "") input2.value = "Falso";
 
             } else {
-                // MODO MÚLTIPLE
                 extraOptions.forEach(div => div.style.display = 'block');
-                
-                // Restaurar required
                 if(input3) input3.required = true;
                 if(input4) input4.required = true;
             }

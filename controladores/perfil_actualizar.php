@@ -1,6 +1,6 @@
 <?php
 // UQ Lead Dev: controladores/perfil_actualizar.php
-// Objetivo: Subir foto de perfil y actualizar la base de datos.
+// Objetivo: Subir foto de perfil a la carpeta 'perfiles'.
 
 session_start();
 require_once 'conexion.php';
@@ -19,8 +19,6 @@ try {
         
         $fileTmpPath = $_FILES['avatar']['tmp_name'];
         $fileName = $_FILES['avatar']['name'];
-        $fileSize = $_FILES['avatar']['size'];
-        $fileType = $_FILES['avatar']['type'];
         
         // Extraer extensión
         $fileNameCmps = explode(".", $fileName);
@@ -31,11 +29,10 @@ try {
 
         if (in_array($fileExtension, $allowedfileExtensions)) {
             
-            // 3. Crear nombre único para evitar conflictos y caché
-            // Ejemplo: profile_15_a8f9d.png
+            // 3. Crear nombre único
             $newFileName = 'profile_' . $usuario_id . '_' . md5(time() . $fileName) . '.' . $fileExtension;
 
-            // Directorio destino (carpeta 'perfiles' en la raíz)
+            // --- CAMBIO: USAR CARPETA 'PERFILES' ---
             $uploadFileDir = '../perfiles/';
             
             // Crear carpeta si no existe
@@ -48,32 +45,35 @@ try {
             // 4. Mover el archivo
             if(move_uploaded_file($fileTmpPath, $dest_path)) {
                 
-                // 5. Borrar foto anterior para no llenar el servidor (Opcional pero recomendado)
-                // Primero buscamos la foto vieja
-                $stmtOld = $pdo->prepare("SELECT avatar FROM usuarios WHERE id = ?");
+                // 5. Borrar foto anterior (opcional)
+                $stmtOld = $pdo->prepare("SELECT foto_perfil FROM usuarios WHERE id = ?");
                 $stmtOld->execute([$usuario_id]);
                 $oldAvatar = $stmtOld->fetchColumn();
 
-                if ($oldAvatar && file_exists($uploadFileDir . $oldAvatar)) {
+                // Solo borramos si existe y no es la por defecto
+                if ($oldAvatar && $oldAvatar != 'default_user.png' && file_exists($uploadFileDir . $oldAvatar)) {
                     unlink($uploadFileDir . $oldAvatar);
                 }
 
                 // 6. Actualizar Base de Datos
-                $sql = "UPDATE usuarios SET avatar = :avatar WHERE id = :id";
+                // Nota: Tu columna en BBDD es 'foto_perfil' o 'avatar'? 
+                // En bbdd.sql dice 'foto_perfil', ajustamos la consulta:
+                $sql = "UPDATE usuarios SET foto_perfil = :avatar WHERE id = :id";
                 $stmt = $pdo->prepare($sql);
                 $stmt->execute(['avatar' => $newFileName, 'id' => $usuario_id]);
 
-                // ¡Éxito!
+                // IMPORTANTE: Actualizar sesión
+                $_SESSION['foto_perfil'] = $newFileName;
+
                 header("Location: ../vistas/perfil.php?status=success");
                 exit;
             } else {
-                die("Error al mover el archivo al directorio de destino. Verifica permisos.");
+                die("Error al mover el archivo a la carpeta 'perfiles'. Verifica permisos.");
             }
         } else {
-            die("Formato de archivo no válido. Solo JPG, PNG, GIF y WEBP.");
+            die("Formato no válido. Solo JPG, PNG, GIF y WEBP.");
         }
     } else {
-        // Si no subió foto, redirigimos sin hacer nada (o podrías mostrar error)
         header("Location: ../vistas/perfil.php?error=no_file");
         exit;
     }

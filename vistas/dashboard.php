@@ -1,6 +1,6 @@
 <?php
-// UQ Lead Dev: dashboard.php
-// Objetivo: Panel principal mejorado con gestión de perfil y UX profesional.
+// UQ Lead Dev: vistas/dashboard.php
+// Objetivo: Panel principal con foto de perfil en carpeta 'perfiles'.
 
 session_start();
 
@@ -15,7 +15,7 @@ require_once '../controladores/conexion.php';
 // Datos del usuario logueado
 $usuario_id = $_SESSION['usuario_id'];
 $nombre_usuario = $_SESSION['nombre_usuario'];
-// Foto de perfil: si no hay en sesión o es null, usar default
+// Foto de perfil desde sesión (se actualiza al subir nueva foto)
 $foto_perfil = !empty($_SESSION['foto_perfil']) ? $_SESSION['foto_perfil'] : 'default_user.png';
 
 $tab_activo = $_GET['tab'] ?? 'mis_cuestionarios';
@@ -94,7 +94,11 @@ if (isset($_SESSION['mensaje'])) {
             <span class="user-welcome">Hola, <?php echo htmlspecialchars($nombre_usuario); ?></span>
             
             <a href="perfil.php" class="nav-icon" title="Editar mi Perfil">
-                <img src="../almacen/<?php echo htmlspecialchars($foto_perfil); ?>" class="icon-img user-icon" style="object-fit: cover;">
+                <?php if (!empty($foto_perfil) && $foto_perfil != 'default_user.png'): ?>
+                    <img src="../perfiles/<?php echo htmlspecialchars($foto_perfil); ?>" class="icon-img user-icon" style="object-fit: cover;">
+                <?php else: ?>
+                    <span class="user-icon" style="background:#ddd; display:inline-block; text-align:center; line-height:35px;">👤</span>
+                <?php endif; ?>
                 Mi Perfil 
             </a>
             
@@ -139,17 +143,16 @@ if (isset($_SESSION['mensaje'])) {
             <table class="data-table">
                 <thead>
                     <tr>
-                        <th style="width: 40%;">Título y Descripción</th> <?php if ($tab_activo == 'ver_cuestionarios'): ?>
+                        <th style="width: 40%;">Título y Descripción</th>
+                        <?php if ($tab_activo == 'ver_cuestionarios'): ?>
                             <th>Autor</th>
                         <?php endif; ?>
-                        
                         <th>Fecha Creación</th>
-                        
                         <?php if ($tab_activo == 'mis_cuestionarios'): ?>
                             <th>Estado</th>
                         <?php endif; ?>
-
-                        <th>Acciones</th> </tr>
+                        <th>Acciones</th> 
+                    </tr>
                 </thead>
                 <tbody>
                     <?php foreach ($cuestionarios as $cuestionario): ?>
@@ -164,7 +167,6 @@ if (isset($_SESSION['mensaje'])) {
                                         <?php echo htmlspecialchars($cuestionario['titulo']); ?>
                                     </a>
                                 <?php endif; ?>
-                                
                                 <br>
                                 <small style="color: #7f8c8d;"><?php echo htmlspecialchars($cuestionario['descripcion']); ?></small>
                             </td>
@@ -192,15 +194,12 @@ if (isset($_SESSION['mensaje'])) {
                             <td>
                                 <div class="actions-wrapper">
                                     <?php if ($tab_activo == 'mis_cuestionarios'): ?>
-                                        
                                         <a href="cuestionario_realizar.php?id=<?php echo $cuestionario['id']; ?>" class="btn-action btn-sm-text btn-info" title="Probar">
                                             Ver
                                         </a>
-
                                         <a href="cuestionario_editar.php?id=<?php echo $cuestionario['id']; ?>" class="btn-action btn-sm-text btn-edit" title="Editar">
                                             Editar
                                         </a>
-                                        
                                         <form action="../controladores/cuestionario_borrar.php" method="POST">
                                             <input type="hidden" name="cuestionario_id" value="<?php echo $cuestionario['id']; ?>">
                                             <button type="submit" class="btn-action btn-sm-text btn-del" title="Borrar" 
@@ -208,7 +207,6 @@ if (isset($_SESSION['mensaje'])) {
                                                 Borrar
                                             </button>
                                         </form>
-
                                     <?php else: ?>
                                         <a href="cuestionario_realizar.php?id=<?php echo $cuestionario['id']; ?>" class="btn btn-primary btn-sm" style="font-size: 0.85rem; padding: 5px 10px;">
                                             Realizar
@@ -216,7 +214,6 @@ if (isset($_SESSION['mensaje'])) {
                                     <?php endif; ?>
                                 </div>
                             </td>
-
                         </tr>
                     <?php endforeach; ?>
                 </tbody>

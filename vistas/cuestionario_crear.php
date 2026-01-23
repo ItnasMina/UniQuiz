@@ -38,7 +38,7 @@ if (!isset($_SESSION['usuario_id'])) {
                 </p>
             </div>
 
-            <form action="../controladores/cuestionario_crear.php" method="POST">
+            <form action="../controladores/cuestionario_guardar.php" method="POST">
                 
                 <div class="form-group">
                     <label for="titulo">Título del Cuestionario *</label>

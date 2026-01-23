@@ -35,7 +35,6 @@ try {
     }
 
     // 2. Obtener Preguntas
-    // Si es aleatorio, usamos ORDER BY RAND(). Si no, por orden.
     $orden_sql = $cuestionario['es_aleatorio'] ? "RAND()" : "orden ASC, id ASC";
     $limite_sql = $cuestionario['es_aleatorio'] ? "LIMIT " . $cuestionario['num_preguntas_aleatorias'] : "";
     
@@ -93,10 +92,10 @@ try {
 
     <header class="main-header private-header small-header">
         <div class="logo">
-            <span style="color:white; font-weight:bold; font-size:1.2rem;">UniQuiz Estudiante</span>
+            <span style="color: #386DBD; font-weight:bold; font-size:1.2rem;">📝 Realizando Test</span>
         </div>
         <div class="user-nav">
-             <a href="dashboard.php" class="btn btn-back" onclick="return confirm('Si sales ahora perderás tus respuestas. ¿Seguro?');">Cancelar</a>
+             <a href="dashboard.php" class="btn btn-secondary" onclick="return confirm('Si sales ahora perderás tus respuestas. ¿Seguro?');">Cancelar</a>
         </div>
     </header>
     
@@ -121,12 +120,19 @@ try {
                     <div class="opciones-container">
                         <?php
                         // Obtener opciones para esta pregunta
-                        $stmtO = $pdo->prepare("SELECT * FROM opciones WHERE pregunta_id = :pid ORDER BY id ASC"); // O RAND() si quisieras barajar respuestas
+                        $stmtO = $pdo->prepare("SELECT * FROM opciones WHERE pregunta_id = :pid ORDER BY id ASC");
                         $stmtO->execute(['pid' => $pregunta['id']]);
                         $opciones = $stmtO->fetchAll();
 
-                        foreach ($opciones as $opcion):
-                        ?>
+                        // --- DIAGNÓSTICO: SI NO HAY OPCIONES, AVISAR ---
+                        if (count($opciones) == 0): ?>
+                            <div style="padding:15px; background-color:#ffe6e6; color:#cc0000; border-radius:5px; border:1px solid #ffcccc;">
+                                ⚠️ <strong>Error de datos:</strong> Esta pregunta no tiene opciones registradas en la base de datos.
+                                <br><small>Por favor, edita la pregunta y vuelve a guardar las opciones.</small>
+                            </div>
+                        <?php endif; ?>
+
+                        <?php foreach ($opciones as $opcion): ?>
                             <label class="opcion-label">
                                 <input type="radio" 
                                        name="respuestas[<?php echo $pregunta['id']; ?>]" 
