@@ -1,0 +1,14 @@
+# Prevent exposing environment variables and credentials
+.env
+
+# Ignore Composer dependencies (these are installed via 'composer install' on the server)
+/vendor/
+
+# Ignore Laragon/OS specific files
+.DS_Store
+Thumbs.db
+error_log
+
+# Ignore user-uploaded files in local development (if we store them locally before S3)
+/public/assets/uploads/*
+!/public/assets/uploads/.gitkeep

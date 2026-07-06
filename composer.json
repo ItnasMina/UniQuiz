@@ -1,0 +1,20 @@
+{
+    "name": "uniquiz/core",
+    "description": "Educational social network for quizzes.",
+    "type": "project",
+    "require": {
+        "php": "^8.1"
+    },
+    "autoload": {
+        "psr-4": {
+            "UniQuiz\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "UniQuiz Dev Team",
+            "email": "dev@uniquiz.com"
+        }
+    ],
+    "minimum-stability": "stable"
+}
