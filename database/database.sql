@@ -1,4 +1,4 @@
--- Database creation with proper charset for full Unicode support (including emojis)
+-- Database creation with proper charset for full Unicode support
 CREATE DATABASE IF NOT EXISTS uniquiz_db
 CHARACTER SET utf8mb4
 COLLATE utf8mb4_unicode_ci;
@@ -8,7 +8,7 @@ USE uniquiz_db;
 -- 1. USERS TABLE
 -- Stores user authentication and profile data.
 CREATE TABLE users (
-    id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    id  BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     username VARCHAR(50) NOT NULL UNIQUE,
     email VARCHAR(255) NOT NULL UNIQUE,
     password_hash VARCHAR(255) NOT NULL, 
@@ -20,18 +20,23 @@ CREATE TABLE users (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     
+
     INDEX idx_username (username),
     INDEX idx_email (email),
     INDEX idx_subscription_expiration (subscription_expires_at)
 ) ENGINE=InnoDB;
 
--- 2. CATEGORIES TABLE
--- Master table for quiz subjects (e.g., 'Mathematics', 'History', 'Programming').
-CREATE TABLE categories (
-    id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-    name VARCHAR(100) NOT NULL UNIQUE,
-    slug VARCHAR(100) NOT NULL UNIQUE, -- Useful for SEO-friendly URLs (e.g., /category/history)
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+-- 2. TAGS TABLE
+-- Master table for multi-dimensional metadata (universities, courses, subjects)
+CREATE TABLE tags (
+    id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(100) NOT NULL,
+    slug VARCHAR(100) NOT NULL UNIQUE,
+    type ENUM('subject', 'course', 'university', 'topic','categories') NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    
+    -- Composite index to quickly search tags of a specific type
+    INDEX idx_type_name (type, name)
 ) ENGINE=InnoDB;
 
 -- 3. QUIZZES TABLE
@@ -42,19 +47,35 @@ CREATE TABLE quizzes (
     category_id INT UNSIGNED DEFAULT NULL,
     title VARCHAR(255) NOT NULL,
     description TEXT,
-    is_published BOOLEAN DEFAULT FALSE, -- Allows drafts before publishing
+    is_published BOOLEAN DEFAULT FALSE,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     
     -- Foreign Keys ensure data integrity
     CONSTRAINT fk_quiz_author FOREIGN KEY (author_id) REFERENCES users(id) ON DELETE CASCADE,
-    CONSTRAINT fk_quiz_category FOREIGN KEY (category_id) REFERENCES categories(id) ON DELETE SET NULL,
     
     -- Indexing for faster feed/search queries
     INDEX idx_quiz_published_created (is_published, created_at)
 ) ENGINE=InnoDB;
 
--- 4. QUESTIONS TABLE
+-- 4. QUIZ_TAGS TABLE (Pivot Table)
+-- Resolves the Many-to-Many relationship between quizzes and tags
+CREATE TABLE quiz_tags (
+    quiz_id BIGINT UNSIGNED NOT NULL,
+    tag_id BIGINT UNSIGNED NOT NULL,
+    
+    -- Foreign keys with CASCADE so if a quiz or tag is deleted, the relationship disappears
+    CONSTRAINT fk_quiz_tags_quiz FOREIGN KEY (quiz_id) REFERENCES quizzes(id) ON DELETE CASCADE,
+    CONSTRAINT fk_quiz_tags_tag FOREIGN KEY (tag_id) REFERENCES tags(id) ON DELETE CASCADE,
+    
+    -- Composite Primary Key ensures a quiz cannot have the exact same tag applied twice
+    PRIMARY KEY (quiz_id, tag_id),
+    
+    -- Index on tag_id allows ultra-fast reverse lookups (e.g., "Find all quizzes for this tag")
+    INDEX idx_tag_id (tag_id)
+) ENGINE=InnoDB;
+
+-- 5. QUESTIONS TABLE
 -- Questions belonging to a specific quiz.
 CREATE TABLE questions (
     id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
@@ -66,7 +87,7 @@ CREATE TABLE questions (
     CONSTRAINT fk_question_quiz FOREIGN KEY (quiz_id) REFERENCES quizzes(id) ON DELETE CASCADE
 ) ENGINE=InnoDB;
 
--- 5. ANSWERS TABLE
+-- 6. ANSWERS TABLE
 -- Possible answers for each question.
 CREATE TABLE answers (
     id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
@@ -77,7 +98,7 @@ CREATE TABLE answers (
     CONSTRAINT fk_answer_question FOREIGN KEY (question_id) REFERENCES questions(id) ON DELETE CASCADE
 ) ENGINE=InnoDB;
 
--- 6. QUIZ ATTEMPTS TABLE (The "Social/Gamification" Engine)
+-- 7. QUIZ ATTEMPTS TABLE
 -- Tracks when a user takes a quiz and their score.
 CREATE TABLE quiz_attempts (
     id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
